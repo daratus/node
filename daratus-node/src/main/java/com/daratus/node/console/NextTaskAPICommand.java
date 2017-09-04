@@ -23,15 +23,19 @@ public class NextTaskAPICommand extends APICommand{
     
     @Override
     public void execute() {
-        String jsonResponse = apiConnector.sendGetRequest(apiPath);
-        if(jsonResponse != null){
-            Task task = taskFactory.createTaskFromJson(jsonResponse);
-            
-            System.out.println("Got a task:");
-            System.out.println(task.getClass().getSimpleName());
-            System.out.println(task);
+        if(application.isLoggedin()){
+            String jsonResponse = apiConnector.sendGetRequest(apiPath + application.getName());
+            if(jsonResponse != null){
+                Task task = taskFactory.createTaskFromJson(jsonResponse);
+                
+                System.out.println("Got a task:");
+                System.out.println(task.getClass().getSimpleName());
+                System.out.println(task);
 
-            application.setCurrentTask(task);
+                application.setCurrentTask(task);
+            }
+        }else{
+            System.out.println("Must login first!");
         }
     }
 

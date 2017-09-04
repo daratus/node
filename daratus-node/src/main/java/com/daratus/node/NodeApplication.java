@@ -26,7 +26,7 @@ public class NodeApplication {
         return factory;
     }
     
-    public boolean hasName(){
+    public boolean isLoggedin(){
         return name != null;
     }
     

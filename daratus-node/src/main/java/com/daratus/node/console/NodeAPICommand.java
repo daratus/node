@@ -1,7 +1,5 @@
 package com.daratus.node.console;
 
-import org.apache.http.client.utils.URIBuilder;
-
 import com.daratus.node.NodeApplication;
 
 public class NodeAPICommand extends APICommand{
@@ -26,10 +24,7 @@ public class NodeAPICommand extends APICommand{
     
     @Override
     public void execute() {
-        URIBuilder uriBuilder = apiConnector.getUriBuilder();
-        uriBuilder.clearParameters();
-        uriBuilder.addParameter("name", name);
-        String jsonResponse = apiConnector.sendGetRequest(apiPath);
+        String jsonResponse = apiConnector.sendGetRequest(apiPath + name);
         if(jsonResponse != null){
             System.out.println("Got response!");
             System.out.println(jsonResponse);
