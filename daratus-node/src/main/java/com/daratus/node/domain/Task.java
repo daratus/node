@@ -37,5 +37,10 @@ public abstract class Task {
     }
     
     public abstract void execute();
+    
+    @Override
+    public String toString() {
+        return targetURL;
+    }
 
 }

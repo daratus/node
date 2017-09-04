@@ -1,6 +1,8 @@
 package com.daratus.node.console;
 
 import com.daratus.node.APIConnector;
+import com.daratus.node.domain.Task;
+import com.daratus.node.domain.TaskFactory;
 
 public class APICommand extends AbstractCommand{
 
@@ -28,7 +30,13 @@ public class APICommand extends AbstractCommand{
 
     @Override
     public void execute() {
-        apiConnector.sendRequest(apiPath);
+        String jsonResponse = apiConnector.sendGetRequest(apiPath);
+        TaskFactory taskFactory = new TaskFactory();
+        Task task = taskFactory.createTaskFromJson(jsonResponse);
+        System.out.println("Got a task:");
+        System.out.println(task.getClass().getSimpleName());
+        System.out.println(task);
+
     }
 
 }

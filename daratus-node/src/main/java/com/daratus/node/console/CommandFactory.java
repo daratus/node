@@ -39,7 +39,7 @@ public class CommandFactory {
             return new APICommand(commandToken, APICommand.NODE_LOGIN_PATH, apiConnector);
         }else if(commandToken.equals(AbstractCommand.REGISTER)){
             return new APICommand(commandToken, APICommand.NODE_REGISTER_PATH, apiConnector);
-        }else if(commandToken.equals(AbstractCommand.REGISTER)){
+        }else if(commandToken.equals(AbstractCommand.NEXT)){
             return new APICommand(commandToken, APICommand.NEXT_TASK_PATH, apiConnector);
         }else if(commandToken.equals(AbstractCommand.EXIT)){
             return new DefaultCommand(commandToken);

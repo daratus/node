@@ -6,15 +6,12 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-
-import com.daratus.node.domain.Task;
-import com.daratus.node.domain.TaskFactory;
 
 public class APIConnector {
 
@@ -27,25 +24,23 @@ public class APIConnector {
         httpClient = HttpClients.createDefault();
     }
     
-    public void sendRequest(String path){
+    public String sendGetRequest(String path){
         try {
             uriBuilder.setPath("/data-contract/next-task/");
             URI uri = uriBuilder.build();
             HttpGet getRequest = new HttpGet(uri);
             getRequest.addHeader("accept", "application/json");
             
-            HttpResponse response = httpClient.execute(getRequest);
-            
+            CloseableHttpResponse response = httpClient.execute(getRequest);
             if(response.getStatusLine().getStatusCode() == 200){
                 BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-                TaskFactory taskFactory = new TaskFactory();
                 StringBuilder stringBuilder = new StringBuilder();
                 String line;
                 while( (line = reader.readLine()) != null){
                     stringBuilder.append(line);
                 }
                 
-                Task task = taskFactory.createTaskFromJson(stringBuilder.toString());
+                return stringBuilder.toString();
             }
 
         } catch (URISyntaxException e) {
@@ -59,6 +54,7 @@ public class APIConnector {
             e.printStackTrace();
         }
         
+        return "";
     }
     
 }
