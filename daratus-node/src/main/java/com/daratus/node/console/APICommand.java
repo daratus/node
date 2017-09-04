@@ -6,14 +6,17 @@ public class APICommand extends AbstractCommand{
 
     public static final String NEXT_TASK_PATH = "/data-contract/next-task/";
 
-    public static final String NODE_LOGIN_PATH = "";
+    public static final String NODE_LOGIN_PATH = "/node/login/";
 
-    public static final String NODE_REGISTER_PATH = "";
+    public static final String NODE_REGISTER_PATH = "/node/register/";
     
     private APIConnector apiConnector;
     
-    public APICommand(String commandToken, APIConnector apiConnector) {
+    private String apiPath = "";
+    
+    public APICommand(String commandToken, String apiPath, APIConnector apiConnector) {
         super(commandToken);
+        this.apiPath = apiPath;
         this.apiConnector = apiConnector;
     }
 
@@ -25,8 +28,7 @@ public class APICommand extends AbstractCommand{
 
     @Override
     public void execute() {
-        // TODO Auto-generated method stub
-        
+        apiConnector.sendRequest(apiPath);
     }
 
 }

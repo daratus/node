@@ -35,6 +35,12 @@ public class CommandFactory {
         String commandToken = commandParameters[0];
         if(commandToken.equals(AbstractCommand.HELP)){
             return new DefaultCommand(commandToken);
+        }else if(commandToken.equals(AbstractCommand.LOGIN)){
+            return new APICommand(commandToken, APICommand.NODE_LOGIN_PATH, apiConnector);
+        }else if(commandToken.equals(AbstractCommand.REGISTER)){
+            return new APICommand(commandToken, APICommand.NODE_REGISTER_PATH, apiConnector);
+        }else if(commandToken.equals(AbstractCommand.REGISTER)){
+            return new APICommand(commandToken, APICommand.NEXT_TASK_PATH, apiConnector);
         }else{
             return unrecognizedCommand;
         }
