@@ -1,19 +1,19 @@
 package com.daratus.node.console;
 
-import com.daratus.node.NodeApplication;
+import com.daratus.node.NodeContext;
 import com.daratus.node.domain.Task;
 import com.daratus.node.domain.TaskFactory;
 
 public class NextTaskAPICommand extends APICommand{
 
-    private NodeApplication application;
+    private NodeContext context;
     
     private TaskFactory taskFactory;
     
-    public NextTaskAPICommand(String commandToken, String apiPath, NodeApplication application) {
-        super(commandToken, apiPath, application.getConnector());
-        this.taskFactory = application.getFactory();
-        this.application = application;
+    public NextTaskAPICommand(String commandToken, String apiPath, NodeContext context) {
+        super(commandToken, apiPath, context.getConnector());
+        this.taskFactory = context.getFactory();
+        this.context = context;
     }
 
     @Override
@@ -23,8 +23,8 @@ public class NextTaskAPICommand extends APICommand{
     
     @Override
     public void execute() {
-        if(application.isLoggedin()){
-            String jsonResponse = apiConnector.sendGetRequest(apiPath + application.getName());
+        if(context.isLoggedin()){
+            String jsonResponse = apiConnector.sendGetRequest(apiPath + context.getName());
             if(jsonResponse != null){
                 Task task = taskFactory.createTaskFromJson(jsonResponse);
                 
@@ -32,7 +32,7 @@ public class NextTaskAPICommand extends APICommand{
                 System.out.println(task.getClass().getSimpleName());
                 System.out.println(task);
 
-                application.setCurrentTask(task);
+                context.setCurrentTask(task);
             }
         }else{
             System.out.println("Must login first!");

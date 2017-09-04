@@ -1,16 +1,16 @@
 package com.daratus.node.console;
 
-import com.daratus.node.NodeApplication;
+import com.daratus.node.NodeContext;
 
 public class NodeAPICommand extends APICommand{
 
     private String name = "";
     
-    private NodeApplication application;
+    private NodeContext context;
     
-    public NodeAPICommand(String commandToken, String apiPath, NodeApplication application) {
-        super(commandToken, apiPath, application.getConnector());
-        this.application = application;
+    public NodeAPICommand(String commandToken, String apiPath, NodeContext context) {
+        super(commandToken, apiPath, context.getConnector());
+        this.context = context;
     }
 
     @Override
@@ -28,7 +28,7 @@ public class NodeAPICommand extends APICommand{
         if(jsonResponse != null){
             System.out.println("Got response!");
             System.out.println(jsonResponse);
-            application.setName(name);
+            context.setName(name);
         }
     }
 

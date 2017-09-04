@@ -9,7 +9,6 @@ import org.json.JSONObject;
 public class TaskFactory {
 
     
-    
     public Task createTaskFromJson(String jsonTask) {
         Task task = null;
         try {
@@ -42,5 +41,4 @@ public class TaskFactory {
         return task;
     }
 
-    
 }

@@ -1,50 +1,41 @@
 package com.daratus.node;
 
-import com.daratus.node.domain.Task;
+import java.util.Scanner;
+
+import org.apache.http.client.utils.URIBuilder;
+
+import com.daratus.node.console.AbstractCommand;
+import com.daratus.node.console.CommandFactory;
+import com.daratus.node.console.DefaultCommand;
 import com.daratus.node.domain.TaskFactory;
 
-public class NodeApplication {
-    
-    private APIConnector connector;
+/**
+ * Hello world!
+ *
+ */
+public class NodeApplication 
+{
+    public static void main( String[] args )
+    {
+        
+        URIBuilder uriBuilder = new URIBuilder();
+        uriBuilder.setHost("86.100.97.40");
+        uriBuilder.setScheme("http");
+        uriBuilder.setPort(8080);
 
-    private TaskFactory factory;
-    
-    private String name = null;
-    
-    private Task currentTask = null;
-    
-    public NodeApplication(APIConnector connector, TaskFactory factory) {
-        this.connector = connector;
-        this.factory = factory;
-    }
-
-    public APIConnector getConnector() {
-        return connector;
-    }
-    
-    public TaskFactory getFactory() {
-        return factory;
-    }
-    
-    public boolean isLoggedin(){
-        return name != null;
-    }
-    
-    public void setName(String name) {
-        this.name = name;
-    }
-    
-    public String getName() {
-        return name;
-    }
-    
-    public void setCurrentTask(Task currentTask) {
-        this.currentTask = currentTask;
-    }
-    
-    public void executeCurrentTask(){
-        if(currentTask != null){
-            
+        APIConnector apiConnector = new APIConnector(uriBuilder);
+        TaskFactory taskFactory = new TaskFactory();
+        NodeContext context = new NodeContext(apiConnector, taskFactory);
+        
+        Scanner scanner = new Scanner(System.in);
+        CommandFactory factory = new CommandFactory(context);
+        AbstractCommand command = new DefaultCommand(AbstractCommand.HELP);
+        command.execute();
+        while (! command.evaluate(AbstractCommand.EXIT)) {
+            command = factory.createCommand(scanner.nextLine());
+            command.execute();
         }
+        scanner.close();
+         
     }
 }
