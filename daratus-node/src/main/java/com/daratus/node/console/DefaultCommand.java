@@ -18,7 +18,7 @@ public class DefaultCommand extends AbstractCommand {
     @Override
     public void execute() {
         if(evaluate(AbstractCommand.HELP)){
-            System.out.println("## Daratus Node v1.0 ##");
+            System.out.println("### Daratus Node v1.0 ###");
             System.out.println("#");
             System.out.println("# Available commands:");
             System.out.println("# " + AbstractCommand.REGISTER + " <name> - registers new node, name must be unique.");
