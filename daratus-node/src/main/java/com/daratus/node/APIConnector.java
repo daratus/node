@@ -24,6 +24,10 @@ public class APIConnector {
         httpClient = HttpClients.createDefault();
     }
     
+    public URIBuilder getUriBuilder() {
+        return uriBuilder;
+    }
+    
     public String sendGetRequest(String path){
         try {
             uriBuilder.setPath("/data-contract/next-task/");
@@ -42,7 +46,7 @@ public class APIConnector {
                 
                 return stringBuilder.toString();
             }
-
+            
         } catch (URISyntaxException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

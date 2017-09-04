@@ -3,7 +3,7 @@ package com.daratus.node.console;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.daratus.node.APIConnector;
+import com.daratus.node.NodeApplication;
 
 public class CommandFactory {
 
@@ -11,10 +11,10 @@ public class CommandFactory {
     
     private DefaultCommand unrecognizedCommand = new DefaultCommand();
     
-    private APIConnector apiConnector;
+    private NodeApplication application;
     
-    public CommandFactory(APIConnector apiConnector) {
-        this.apiConnector = apiConnector;
+    public CommandFactory(NodeApplication application) {
+        this.application = application;
     }
     
     public AbstractCommand createCommand(String commandLine){
@@ -36,11 +36,11 @@ public class CommandFactory {
         if(commandToken.equals(AbstractCommand.HELP)){
             return new DefaultCommand(commandToken);
         }else if(commandToken.equals(AbstractCommand.LOGIN)){
-            return new APICommand(commandToken, APICommand.NODE_LOGIN_PATH, apiConnector);
+            return new NodeAPICommand(commandToken, APICommand.NODE_LOGIN_PATH, application);
         }else if(commandToken.equals(AbstractCommand.REGISTER)){
-            return new APICommand(commandToken, APICommand.NODE_REGISTER_PATH, apiConnector);
+            return new NodeAPICommand(commandToken, APICommand.NODE_REGISTER_PATH, application);
         }else if(commandToken.equals(AbstractCommand.NEXT)){
-            return new APICommand(commandToken, APICommand.NEXT_TASK_PATH, apiConnector);
+            return new NextTaskAPICommand(commandToken, APICommand.NEXT_TASK_PATH, application);
         }else if(commandToken.equals(AbstractCommand.EXIT)){
             return new DefaultCommand(commandToken);
         }else{
