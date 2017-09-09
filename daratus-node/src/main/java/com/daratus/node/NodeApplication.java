@@ -2,8 +2,6 @@ package com.daratus.node;
 
 import java.util.Scanner;
 
-import org.apache.http.client.utils.URIBuilder;
-
 import com.daratus.node.console.AbstractCommand;
 import com.daratus.node.console.CommandFactory;
 import com.daratus.node.console.DefaultCommand;
@@ -18,13 +16,9 @@ public class NodeApplication
     public static void main( String[] args )
     {
         
-        URIBuilder uriBuilder = new URIBuilder();
-        uriBuilder.setHost("86.100.97.40");
-        uriBuilder.setScheme("http");
-        uriBuilder.setPort(8080);
-
-        APIConnector apiConnector = new APIConnector(uriBuilder);
-        TaskFactory taskFactory = new TaskFactory();
+        APIHttpConnector apiConnector = new APIHttpConnector("86.100.97.40", 8080, "http");
+        ScrapingHttpConnector scrappingConnector = new ScrapingHttpConnector();
+        TaskFactory taskFactory = new TaskFactory(scrappingConnector);
         NodeContext context = new NodeContext(apiConnector, taskFactory);
         
         Scanner scanner = new Scanner(System.in);

@@ -1,9 +1,14 @@
 package com.daratus.node.console;
 
+import com.daratus.node.NodeContext;
+
 public class TaskCommand extends AbstractCommand{
     
-    public TaskCommand(String commandToken) {
+    private NodeContext context;
+    
+    public TaskCommand(String commandToken, NodeContext context) {
         super(commandToken);
+        this.context = context;
     }
 
     @Override
@@ -14,8 +19,7 @@ public class TaskCommand extends AbstractCommand{
 
     @Override
     public void execute() {
-        // TODO Auto-generated method stub
-        
+        context.executeCurrentTask();
     }
     
 

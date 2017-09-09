@@ -13,7 +13,7 @@ public abstract class Task {
     
     private String id = "";
     
-    private String targetURL = "";
+    protected String targetURL = "";
     
     private Map<String, String> data = new HashMap<String, String>();
     

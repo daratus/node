@@ -1,5 +1,6 @@
 package com.daratus.node.console;
 
+import com.daratus.node.RequestMethod;
 import com.daratus.node.NodeContext;
 
 public class NodeAPICommand extends APICommand{
@@ -9,7 +10,7 @@ public class NodeAPICommand extends APICommand{
     private NodeContext context;
     
     public NodeAPICommand(String commandToken, String apiPath, NodeContext context) {
-        super(commandToken, apiPath, context.getConnector());
+        super(commandToken, apiPath, context.getAPIConnector());
         this.context = context;
     }
 
@@ -24,7 +25,7 @@ public class NodeAPICommand extends APICommand{
     
     @Override
     public void execute() {
-        String jsonResponse = apiConnector.sendGetRequest(apiPath + name);
+        String jsonResponse = apiConnector.sendRequest(apiPath + name, RequestMethod.GET);
         if(jsonResponse != null){
             System.out.println("Got response!");
             System.out.println(jsonResponse);

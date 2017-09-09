@@ -18,7 +18,7 @@ public class NodeContext {
         this.factory = factory;
     }
 
-    public APIConnector getConnector() {
+    public APIConnector getAPIConnector() {
         return connector;
     }
     
@@ -44,7 +44,10 @@ public class NodeContext {
     
     public void executeCurrentTask(){
         if(currentTask != null){
-            
+            currentTask.execute();
+            currentTask = null;
+        }else{
+            System.out.println("No task is currently available!");
         }
     }
 }

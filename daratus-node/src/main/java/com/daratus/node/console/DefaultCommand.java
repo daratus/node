@@ -22,7 +22,7 @@ public class DefaultCommand extends AbstractCommand {
             System.out.println("#");
             System.out.println("# Available commands:");
             System.out.println("# " + AbstractCommand.REGISTER + " <name> - registers new node, name must be unique.");
-            System.out.println("# " + AbstractCommand.LOGIN + " <name> - logins with existing node.");
+            System.out.println("# " + AbstractCommand.LOGIN + " <id> - logins with existing node.");
             System.out.println("# " + AbstractCommand.NEXT + " - receives a task from the server.");
             System.out.println("# " + AbstractCommand.EXECUTE + " - executes a task if there is one.");
             System.out.println("# " + AbstractCommand.HELP + " - prints title and available commands.");

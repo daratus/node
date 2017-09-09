@@ -1,5 +1,6 @@
 package com.daratus.node.console;
 
+import com.daratus.node.RequestMethod;
 import com.daratus.node.NodeContext;
 import com.daratus.node.domain.Task;
 import com.daratus.node.domain.TaskFactory;
@@ -11,7 +12,7 @@ public class NextTaskAPICommand extends APICommand{
     private TaskFactory taskFactory;
     
     public NextTaskAPICommand(String commandToken, String apiPath, NodeContext context) {
-        super(commandToken, apiPath, context.getConnector());
+        super(commandToken, apiPath, context.getAPIConnector());
         this.taskFactory = context.getFactory();
         this.context = context;
     }
@@ -24,7 +25,7 @@ public class NextTaskAPICommand extends APICommand{
     @Override
     public void execute() {
         if(context.isLoggedin()){
-            String jsonResponse = apiConnector.sendGetRequest(apiPath + context.getName());
+            String jsonResponse = apiConnector.sendRequest(apiPath + context.getName(), RequestMethod.GET);
             if(jsonResponse != null){
                 Task task = taskFactory.createTaskFromJson(jsonResponse);
                 

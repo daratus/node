@@ -26,6 +26,7 @@ public class CommandFactory {
             command.parseParameters(commandParameters);
         }else{
             command = createCommand(commandParameters);
+            command.parseParameters(commandParameters);
             commandPool.put(commandToken, command);
         }
         return command;
@@ -41,6 +42,8 @@ public class CommandFactory {
             return new NodeAPICommand(commandToken, APICommand.NODE_PATH, context);
         }else if(commandToken.equals(AbstractCommand.NEXT)){
             return new NextTaskAPICommand(commandToken, APICommand.NEXT_TASK_PATH, context);
+        }else if(commandToken.equals(AbstractCommand.EXECUTE)){
+            return new TaskCommand(commandToken, context);
         }else if(commandToken.equals(AbstractCommand.EXIT)){
             return new DefaultCommand(commandToken);
         }else{

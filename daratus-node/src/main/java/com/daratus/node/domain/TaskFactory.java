@@ -6,8 +6,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.daratus.node.ScrapingConnector;
+
 public class TaskFactory {
 
+    private ScrapingConnector connector;
+    
+    public TaskFactory(ScrapingConnector connector) {
+        this.connector = connector;
+    }
     
     public Task createTaskFromJson(String jsonTask) {
         Task task = null;
@@ -15,7 +22,7 @@ public class TaskFactory {
             JSONObject jsonEntryObject = new JSONObject(jsonTask);
             JSONObject jsonTaskObject = null;
             if(jsonEntryObject.has(Task.GET_DATA)){
-                task = new GetData();
+                task = new GetData(connector);
                 jsonTaskObject = jsonEntryObject.getJSONObject(Task.GET_DATA);
             }else if(jsonEntryObject.has(Task.GET_URLS)){
                 task = new GetUrls();
