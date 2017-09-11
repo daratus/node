@@ -1,31 +1,35 @@
 package com.daratus.node.console;
 
-public abstract class AbstractCommand {
+/**
+ * 
+ * @author Zilvinas Vaira
+ *
+ */
+public abstract class AbstractCommand implements Command{
 
-    public static final String EXIT = "exit";
-    
-    public static final String HELP = "help";
-    
-    public static final String LOGIN = "login";
-    
-    public static final String REGISTER = "register";
-    
-    public static final String NEXT = "next";
-    
-    public static final String EXECUTE = "execute";
-    
-    protected String commandToken;
+    /**
+     * 
+     */
+    protected String [] commandParameters = null;
 
-    public AbstractCommand(String commandToken) {
-        this.commandToken = commandToken;
+    /**
+     * 
+     * @param commandParameters
+     */
+    public AbstractCommand(String [] commandParameters) {
+        setParameters(commandParameters);
     }
 
+    public void setParameters(String [] commandParameters){
+        this.commandParameters = commandParameters;
+    }
+    
     public boolean evaluate(String commandToken){
-        return this.commandToken.equals(commandToken);
+        if(commandParameters.length > 0){
+            return commandToken.equals(commandParameters[0]);
+        }else{
+            return false;
+        }
     }
-    
-    public abstract void parseParameters(String [] commandParameters);
-    
-    public abstract void execute();
 
 }

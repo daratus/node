@@ -3,19 +3,17 @@ package com.daratus.node.console;
 public class DefaultCommand extends AbstractCommand {
 
     public DefaultCommand() {
-        super("");
+        super(null);
     }
 
-    public DefaultCommand(String commandToken) {
-        super(commandToken);
-    }
-
-    @Override
-    public void parseParameters(String[] commandParameters) {
-        // Do nothing
+    public DefaultCommand(String [] commandParameters) {
+        super(commandParameters);
     }
     
-    @Override
+    public DefaultCommand(String commandToken) {
+        super(new String[]{commandToken});
+    }
+
     public void execute() {
         if(evaluate(AbstractCommand.HELP)){
             System.out.println("### Daratus Node v1.0 ###");

@@ -6,18 +6,11 @@ public class TaskCommand extends AbstractCommand{
     
     private NodeContext context;
     
-    public TaskCommand(String commandToken, NodeContext context) {
-        super(commandToken);
+    public TaskCommand(String [] commandParameters, NodeContext context) {
+        super(commandParameters);
         this.context = context;
     }
 
-    @Override
-    public void parseParameters(String[] commandParameters) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
     public void execute() {
         context.executeCurrentTask();
     }

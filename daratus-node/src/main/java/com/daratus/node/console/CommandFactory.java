@@ -23,10 +23,8 @@ public class CommandFactory {
         AbstractCommand command = unrecognizedCommand;
         if( commandPool.containsKey(commandToken)){
             command = commandPool.get(commandToken);
-            command.parseParameters(commandParameters);
         }else{
             command = createCommand(commandParameters);
-            command.parseParameters(commandParameters);
             commandPool.put(commandToken, command);
         }
         return command;
@@ -35,17 +33,17 @@ public class CommandFactory {
     private AbstractCommand createCommand(String [] commandParameters){
         String commandToken = commandParameters[0];
         if(commandToken.equals(AbstractCommand.HELP)){
-            return new DefaultCommand(commandToken);
+            return new DefaultCommand(commandParameters);
         }else if(commandToken.equals(AbstractCommand.LOGIN)){
-            return new NodeAPICommand(commandToken, APICommand.NODE_PATH, context);
+            return new NodeAPICommand(commandParameters, APICommand.NODE_PATH, context);
         }else if(commandToken.equals(AbstractCommand.REGISTER)){
-            return new NodeAPICommand(commandToken, APICommand.NODE_PATH, context);
+            return new NodeAPICommand(commandParameters, APICommand.NODE_PATH, context);
         }else if(commandToken.equals(AbstractCommand.NEXT)){
-            return new NextTaskAPICommand(commandToken, APICommand.NEXT_TASK_PATH, context);
+            return new NextTaskAPICommand(commandParameters, APICommand.NEXT_TASK_PATH, context);
         }else if(commandToken.equals(AbstractCommand.EXECUTE)){
-            return new TaskCommand(commandToken, context);
+            return new TaskCommand(commandParameters, context);
         }else if(commandToken.equals(AbstractCommand.EXIT)){
-            return new DefaultCommand(commandToken);
+            return new DefaultCommand(commandParameters);
         }else{
             return unrecognizedCommand;
         }

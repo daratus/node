@@ -1,16 +1,41 @@
 package com.daratus.node.console;
 
 import com.daratus.node.RequestMethod;
+import com.daratus.node.APIConnector;
 import com.daratus.node.NodeContext;
 
-public class NodeAPICommand extends APICommand{
+/**
+ * 
+ * @author Zilvinas Vaira
+ *
+ */
+public class NodeAPICommand extends AbstractParametrizedCommand implements APICommand{
 
+    /**
+     * 
+     */
     private String name = "";
     
+    /**
+     * 
+     */
     private NodeContext context;
+
+    /**
+     * 
+     */
+    protected String apiPath = "";
+
     
-    public NodeAPICommand(String commandToken, String apiPath, NodeContext context) {
-        super(commandToken, apiPath, context.getAPIConnector());
+    /**
+     * 
+     * @param commandParameters
+     * @param apiPath
+     * @param context
+     */
+    public NodeAPICommand(String [] commandParameters, String apiPath, NodeContext context) {
+        super(commandParameters);
+        this.apiPath = apiPath;
         this.context = context;
     }
 
@@ -24,7 +49,8 @@ public class NodeAPICommand extends APICommand{
     }
     
     @Override
-    public void execute() {
+    public void doExecute() {
+        APIConnector apiConnector = context.getAPIConnector();
         String jsonResponse = apiConnector.sendRequest(apiPath + name, RequestMethod.GET);
         if(jsonResponse != null){
             System.out.println("Got response!");
