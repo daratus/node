@@ -1,29 +1,32 @@
 package com.daratus.node;
 
 import com.daratus.node.domain.Task;
-import com.daratus.node.domain.TaskFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class NodeContext {
     
-    private APIConnector connector;
+    private APIConnector apiConnector;
+    
+    private ScrapingConnector scrapingConnector;
 
-    private TaskFactory factory;
+    private ObjectMapper mapper;
     
     private String name = null;
     
     private Task currentTask = null;
     
-    public NodeContext(APIConnector connector, TaskFactory factory) {
-        this.connector = connector;
-        this.factory = factory;
+    public NodeContext(APIConnector apiConnector, ScrapingConnector scrapingConnector, ObjectMapper mapper) {
+        this.apiConnector = apiConnector;
+        this.scrapingConnector = scrapingConnector;
+        this.mapper = mapper;
     }
 
     public APIConnector getAPIConnector() {
-        return connector;
+        return apiConnector;
     }
     
-    public TaskFactory getFactory() {
-        return factory;
+    public ObjectMapper getMapper() {
+        return mapper;
     }
     
     public boolean isLoggedin(){
@@ -44,7 +47,7 @@ public class NodeContext {
     
     public void executeCurrentTask(){
         if(currentTask != null){
-            currentTask.execute();
+            currentTask.execute(scrapingConnector);
             currentTask = null;
         }else{
             System.out.println("No task is currently available!");

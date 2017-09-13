@@ -5,7 +5,7 @@ import java.util.Scanner;
 import com.daratus.node.console.AbstractCommand;
 import com.daratus.node.console.CommandFactory;
 import com.daratus.node.console.DefaultCommand;
-import com.daratus.node.domain.TaskFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Hello world!
@@ -18,8 +18,8 @@ public class NodeApplication
         
         APIHttpConnector apiConnector = new APIHttpConnector("86.100.97.40", 8080, "http");
         ScrapingHttpConnector scrappingConnector = new ScrapingHttpConnector();
-        TaskFactory taskFactory = new TaskFactory(scrappingConnector);
-        NodeContext context = new NodeContext(apiConnector, taskFactory);
+        ObjectMapper mapper = new ObjectMapper();
+        NodeContext context = new NodeContext(apiConnector, scrappingConnector, mapper);
         
         Scanner scanner = new Scanner(System.in);
         CommandFactory factory = new CommandFactory(context);

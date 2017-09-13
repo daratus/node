@@ -1,5 +1,7 @@
 package com.daratus.node.domain;
 
+import com.daratus.node.ScrapingConnector;
+
 /**
  * 
  * @author Zilvinas Vaira
@@ -28,7 +30,7 @@ public class NullTask extends Task {
     }
     
     @Override
-    public void execute() {
+    public void execute(ScrapingConnector connector) {
         try {
             Thread.sleep(sleepInterval * SECONDS_CONVERSION_RATE);
         } catch (InterruptedException e) {
