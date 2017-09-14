@@ -23,13 +23,13 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 })
 public abstract class Task {
     
-    private String id = "";
+    private Long id;
     
     protected String targetURL = "";
     
-    private Map<String, String> data = new HashMap<String, String>();
+    protected Map<String, String> data = new HashMap<String, String>();
     
-    private List<String> nextUrls = new ArrayList<String>();
+    private List<String> urls = new ArrayList<String>();
     
     public void setTargetURL(String targetURL) {
         this.targetURL = targetURL;
@@ -39,8 +39,8 @@ public abstract class Task {
         this.data = data;
     }
     
-    public void setNextUrls(List<String> nextUrls) {
-        this.nextUrls = nextUrls;
+    public void setUrls(List<String> nextUrls) {
+        this.urls = nextUrls;
     }
     
     public abstract void execute(ScrapingConnector connector);

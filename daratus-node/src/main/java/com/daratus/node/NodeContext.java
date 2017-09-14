@@ -1,6 +1,8 @@
 package com.daratus.node;
 
+import com.daratus.node.console.APICommand;
 import com.daratus.node.domain.Task;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class NodeContext {
@@ -48,6 +50,12 @@ public class NodeContext {
     public void executeCurrentTask(){
         if(currentTask != null){
             currentTask.execute(scrapingConnector);
+            try {
+                apiConnector.setJsonEntity("result", mapper.writeValueAsString(currentTask));
+                apiConnector.sendRequest(APICommand.NEXT_TASK_PATH + getName(), RequestMethod.POST);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
             currentTask = null;
         }else{
             System.out.println("No task is currently available!");
