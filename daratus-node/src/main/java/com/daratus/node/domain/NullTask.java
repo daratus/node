@@ -36,6 +36,7 @@ public class NullTask extends Task {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        setCompleted(false);
     }
 
 }

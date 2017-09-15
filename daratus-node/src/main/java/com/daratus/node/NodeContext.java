@@ -2,10 +2,11 @@ package com.daratus.node;
 
 import com.daratus.node.console.APICommand;
 import com.daratus.node.domain.Task;
+import com.daratus.node.domain.TaskObserver;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class NodeContext {
+public class NodeContext implements TaskObserver{
     
     private APIConnector apiConnector;
     
@@ -45,20 +46,30 @@ public class NodeContext {
     
     public void setCurrentTask(Task currentTask) {
         this.currentTask = currentTask;
+        this.currentTask.addTaskObserver(this);
     }
     
     public void executeCurrentTask(){
         if(currentTask != null){
             currentTask.execute(scrapingConnector);
-            try {
-                apiConnector.setJsonEntity("result", mapper.writeValueAsString(currentTask));
-                apiConnector.sendRequest(APICommand.NEXT_TASK_PATH + getName(), RequestMethod.POST);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
-            currentTask = null;
         }else{
             System.out.println("No task is currently available!");
         }
     }
+    
+    private void sendResponse(Task task){
+        try {
+            apiConnector.setJsonEntity("result", mapper.writeValueAsString(task));
+            apiConnector.sendRequest(APICommand.NEXT_TASK_PATH + getName(), RequestMethod.POST);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void notify(Task task) {
+        if(task.isCompleted()){
+            sendResponse(task);
+        }
+    }
+    
 }

@@ -6,8 +6,15 @@ public class GetUrls extends Task {
 
     @Override
     public void execute(ScrapingConnector connector) {
-        // TODO Auto-generated method stub
+        String htmlResponse = connector.scrape(targetURL);
         
+        buildUrls(htmlResponse);
+        
+        System.out.println("Got HTML response: ");
+        System.out.print(htmlResponse != null);
+        System.out.println();
+
+        setCompleted(true);
     }
 
 }
