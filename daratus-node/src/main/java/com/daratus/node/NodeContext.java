@@ -14,6 +14,10 @@ public class NodeContext implements TaskObserver{
 
     private ObjectMapper mapper;
     
+    private NodeState state = null;
+    
+    private boolean isRunning = false;
+    
     private String name = null;
     
     private Task currentTask = null;
@@ -23,7 +27,15 @@ public class NodeContext implements TaskObserver{
         this.scrapingConnector = scrapingConnector;
         this.mapper = mapper;
     }
+    
+    public void handle(){
+        state.handle(this);
+    }
 
+    public void setNodeState(NodeState state){
+        this.state = state;
+    }
+    
     public APIConnector getAPIConnector() {
         return apiConnector;
     }
@@ -34,6 +46,14 @@ public class NodeContext implements TaskObserver{
     
     public boolean isLoggedin(){
         return name != null;
+    }
+    
+    public void setRunning(boolean isRunnig){
+        this.isRunning = isRunnig;
+    }
+    
+    public boolean isRunning(){
+        return isRunning;
     }
     
     public void setName(String name) {

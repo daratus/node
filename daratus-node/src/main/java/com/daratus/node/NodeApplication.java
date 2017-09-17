@@ -19,7 +19,15 @@ public class NodeApplication
         APIHttpConnector apiConnector = new APIHttpConnector("86.100.97.40", 8080, "http");
         ScrapingHttpConnector scrappingConnector = new ScrapingHttpConnector();
         ObjectMapper mapper = new ObjectMapper();
+        
+        NodeState initialState = new InitialState();
+        NodeState logedinState = new LogedinState(initialState);
+        initialState.setNextState(logedinState);
+        NodeState runningState = new RunningState(initialState, logedinState);
+        logedinState.setNextState(runningState);
+        
         NodeContext context = new NodeContext(apiConnector, scrappingConnector, mapper);
+        context.setNodeState(initialState);
         
         Scanner scanner = new Scanner(System.in);
         CommandFactory factory = new CommandFactory(context);
@@ -28,6 +36,7 @@ public class NodeApplication
         while (! command.evaluate(AbstractCommand.EXIT)) {
             command = factory.createCommand(scanner.nextLine());
             command.execute();
+            context.handle();
         }
         scanner.close();
          

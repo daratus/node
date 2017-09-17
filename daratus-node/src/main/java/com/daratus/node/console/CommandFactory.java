@@ -36,12 +36,18 @@ public class CommandFactory {
             return new DefaultCommand(commandParameters);
         }else if(commandToken.equals(AbstractCommand.LOGIN)){
             return new NodeAPICommand(commandParameters, APICommand.NODE_PATH, context);
+        }else if(commandToken.equals(AbstractCommand.LOGOUT)){
+            return new LogoutCommand(commandParameters, context);
         }else if(commandToken.equals(AbstractCommand.REGISTER)){
             return new NodeAPICommand(commandParameters, APICommand.NODE_PATH, context);
         }else if(commandToken.equals(AbstractCommand.NEXT)){
             return new NextTaskAPICommand(commandParameters, APICommand.NEXT_TASK_PATH, context);
         }else if(commandToken.equals(AbstractCommand.EXECUTE)){
             return new TaskCommand(commandParameters, context);
+        }else if(commandToken.equals(AbstractCommand.START)){
+            return new StartStopCommand(commandParameters, context, true);
+        }else if(commandToken.equals(AbstractCommand.STOP)){
+            return new StartStopCommand(commandParameters, context, false);
         }else if(commandToken.equals(AbstractCommand.EXIT)){
             return new DefaultCommand(commandParameters);
         }else{

@@ -8,9 +8,15 @@ public interface Command {
     
     public static final String LOGIN = "login";
     
+    public static final String LOGOUT = "logout";
+    
     public static final String REGISTER = "register";
     
     public static final String NEXT = "next";
+
+    public static final String START = "start";
+
+    public static final String STOP = "stop";
     
     public static final String EXECUTE = "execute";
     
