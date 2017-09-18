@@ -12,7 +12,7 @@ public class AuthenticatedState extends NodeState{
     public void handle(NodeContext context) {
         if(!context.isAuthenticated()){
             context.setCurrentState(initialState);
-        }else if(context.isRunning()){
+        }else if(context.isRunning() && isNextState()){
             Thread contextThread = new Thread(context);
             context.setCurrentState(nextState);
             contextThread.start();

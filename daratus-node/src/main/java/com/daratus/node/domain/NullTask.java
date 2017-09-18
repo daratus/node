@@ -9,7 +9,7 @@ import com.daratus.node.ScrapingConnector;
  */
 public class NullTask extends Task {
 
-    public static final long SECONDS_CONVERSION_RATE = 10000000L;
+    public static final long SECONDS_CONVERSION_RATE = 1000L;
     
     private int sleepInterval = 10;
     

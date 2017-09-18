@@ -12,7 +12,7 @@ public class LogoutCommand extends AbstractCommand {
     }
 
     public void execute() {
-        context.setName(null);
+        context.logout();
     }
 
 }

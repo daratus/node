@@ -46,17 +46,6 @@ public class NodeContext implements TaskObserver, Runnable{
         this.currentState = state;
     }
     
-    public void setName(String name) {
-        this.name = name;
-    }
-    
-    public String getName() {
-        return name;
-    }
-
-    public boolean isAuthenticated(){
-        return name != null;
-    }
     
     public void setRunning(boolean isRunnig){
         this.isRunning = isRunnig;
@@ -67,12 +56,32 @@ public class NodeContext implements TaskObserver, Runnable{
     }
     
     public void authenticate(String apiPath, String name){
-        String jsonResponse = apiConnector.sendRequest(apiPath + name, RequestMethod.GET);
-        if(jsonResponse != null){
-            System.out.println("Got response!");
-            System.out.println(jsonResponse);
-            setName(name);
+        if(!isAuthenticated()){
+            String jsonResponse = apiConnector.sendRequest(apiPath + name, RequestMethod.GET);
+            if(jsonResponse != null){
+                System.out.println("Got response!");
+                System.out.println(jsonResponse);
+                setName(name);
+            }
         }
+    }
+    
+    public void setName(String name) {
+        if(this.name == null){
+            this.name = name;
+        }
+    }
+    
+    public String getName() {
+        return name;
+    }
+
+    public boolean isAuthenticated(){
+        return name != null;
+    }
+    
+    public void logout(){
+        this.name = null;
     }
     
     public void getNextTask(String apiPath){
