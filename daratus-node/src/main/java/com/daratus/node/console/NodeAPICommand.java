@@ -1,7 +1,5 @@
 package com.daratus.node.console;
 
-import com.daratus.node.RequestMethod;
-import com.daratus.node.APIConnector;
 import com.daratus.node.NodeContext;
 
 /**
@@ -50,15 +48,7 @@ public class NodeAPICommand extends AbstractParametrizedCommand implements APICo
     
     @Override
     public void doExecute() {
-        APIConnector apiConnector = context.getAPIConnector();
-        String jsonResponse = apiConnector.sendRequest(apiPath + name, RequestMethod.GET);
-        if(jsonResponse != null){
-            System.out.println("Got response!");
-            System.out.println(jsonResponse);
-            context.setName(name);
-        }
+        context.authenticate(apiPath, name);
     }
-
-
 
 }

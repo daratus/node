@@ -13,21 +13,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class NodeApplication 
 {
-    public static void main( String[] args )
-    {
+    public static void main( String[] args ){
         
         APIHttpConnector apiConnector = new APIHttpConnector("86.100.97.40", 8080, "http");
         ScrapingHttpConnector scrappingConnector = new ScrapingHttpConnector();
         ObjectMapper mapper = new ObjectMapper();
         
         NodeState initialState = new InitialState();
-        NodeState logedinState = new LogedinState(initialState);
+        NodeState logedinState = new AuthenticatedState(initialState);
         initialState.setNextState(logedinState);
         NodeState runningState = new RunningState(initialState, logedinState);
         logedinState.setNextState(runningState);
         
         NodeContext context = new NodeContext(apiConnector, scrappingConnector, mapper);
-        context.setNodeState(initialState);
+        context.setCurrentState(initialState);
         
         Scanner scanner = new Scanner(System.in);
         CommandFactory factory = new CommandFactory(context);
@@ -36,7 +35,7 @@ public class NodeApplication
         while (! command.evaluate(AbstractCommand.EXIT)) {
             command = factory.createCommand(scanner.nextLine());
             command.execute();
-            context.handle();
+            context.handleCurrentState();
         }
         scanner.close();
          

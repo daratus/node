@@ -1,12 +1,14 @@
 package com.daratus.node;
 
+import java.io.IOException;
+
 import com.daratus.node.console.APICommand;
 import com.daratus.node.domain.Task;
 import com.daratus.node.domain.TaskObserver;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class NodeContext implements TaskObserver{
+public class NodeContext implements TaskObserver, Runnable{
     
     private APIConnector apiConnector;
     
@@ -14,7 +16,7 @@ public class NodeContext implements TaskObserver{
 
     private ObjectMapper mapper;
     
-    private NodeState state = null;
+    protected NodeState currentState = null;
     
     private boolean isRunning = false;
     
@@ -27,15 +29,7 @@ public class NodeContext implements TaskObserver{
         this.scrapingConnector = scrapingConnector;
         this.mapper = mapper;
     }
-    
-    public void handle(){
-        state.handle(this);
-    }
 
-    public void setNodeState(NodeState state){
-        this.state = state;
-    }
-    
     public APIConnector getAPIConnector() {
         return apiConnector;
     }
@@ -44,7 +38,23 @@ public class NodeContext implements TaskObserver{
         return mapper;
     }
     
-    public boolean isLoggedin(){
+    public void handleCurrentState(){
+        currentState.handle(this);
+    }
+
+    public void setCurrentState(NodeState state){
+        this.currentState = state;
+    }
+    
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    public String getName() {
+        return name;
+    }
+
+    public boolean isAuthenticated(){
         return name != null;
     }
     
@@ -56,12 +66,32 @@ public class NodeContext implements TaskObserver{
         return isRunning;
     }
     
-    public void setName(String name) {
-        this.name = name;
+    public void authenticate(String apiPath, String name){
+        String jsonResponse = apiConnector.sendRequest(apiPath + name, RequestMethod.GET);
+        if(jsonResponse != null){
+            System.out.println("Got response!");
+            System.out.println(jsonResponse);
+            setName(name);
+        }
     }
     
-    public String getName() {
-        return name;
+    public void getNextTask(String apiPath){
+        if(isAuthenticated()){
+            String jsonResponse = apiConnector.sendRequest(apiPath + getName(), RequestMethod.GET);
+            if(jsonResponse != null){
+                try {
+                    Task task = mapper.readValue(jsonResponse, Task.class);
+                    System.out.println("Got a task:");
+                    System.out.println(task.getClass().getSimpleName());
+                    System.out.println(task);
+                    setCurrentTask(task);
+                } catch (IOException e) {
+                    System.out.println("Could not read task from server!");
+                }
+            }
+        }else{
+            System.out.println("Must login first!");
+        }
     }
     
     public void setCurrentTask(Task currentTask) {
@@ -70,10 +100,10 @@ public class NodeContext implements TaskObserver{
     }
     
     public void executeCurrentTask(){
-        if(currentTask != null){
+        if(isAuthenticated() && currentTask != null){
             currentTask.execute(scrapingConnector);
         }else{
-            System.out.println("No task is currently available!");
+            System.out.println("No task is currently available! Or must login first!");
         }
     }
     
@@ -85,10 +115,16 @@ public class NodeContext implements TaskObserver{
             e.printStackTrace();
         }
     }
-
+    
     public void notify(Task task) {
         if(task.isCompleted()){
             sendResponse(task);
+        }
+    }
+
+    public void run() {
+        while(isRunning()){
+            executeCurrentTask();
         }
     }
     

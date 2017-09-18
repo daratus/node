@@ -14,16 +14,12 @@ public class RunningState extends NodeState{
     
     @Override
     public void handle(NodeContext context) {
-        if(!context.isLoggedin()){
-            context.setNodeState(initialState);
+        if(!context.isAuthenticated()){
+            context.setCurrentState(initialState);
+            context.setRunning(false);
         }else if(!context.isRunning()){
-            context.setNodeState(logedinState);
-        }else{
-            
+            context.setCurrentState(logedinState);
         }
-        
     }
-    
-    
 
 }

@@ -13,6 +13,10 @@ public abstract class NodeState {
         this.nextState = nextstate;
     }
     
+    public boolean isNextState(){
+        return nextState != null;
+    }
+    
     public abstract void handle(NodeContext context);
 
 }
