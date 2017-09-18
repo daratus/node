@@ -49,11 +49,6 @@ public class AuthenticationStateTest {
         initialState.handle(context);
         assertNotNull(context.getCurrentState());
         assertEquals(initialState, context.getCurrentState());
-        
-        // TODO Refactoring required for next task
-        context.getNextTask(APICommand.NEXT_TASK_PATH);
-        // TODO Refactoring required for execute current
-        context.executeCurrentTask();
     }
     
     /**

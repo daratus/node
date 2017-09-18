@@ -74,11 +74,6 @@ public class BlockedStateTest {
         assertNotNull(context.getCurrentState());
         assertEquals(blockedState, context.getCurrentState());
         assertEquals(originalName, context.getName());
-        
-        // TODO Refactoring required for next task
-        context.getNextTask(APICommand.NEXT_TASK_PATH);
-        // TODO Refactoring required for execute current
-        context.executeCurrentTask();
     }
     
     /**
