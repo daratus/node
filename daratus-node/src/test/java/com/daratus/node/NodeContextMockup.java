@@ -14,10 +14,10 @@ public class NodeContextMockup extends NodeContext {
     
     @Override
     public void run() {
-        while(isRunning()){
+        while(isBlocked()){
             try {
                 System.out.println("Executing loop!");
-                Thread.sleep(1 * NullTask.SECONDS_CONVERSION_RATE);
+                Thread.sleep(1 * NullTask.SECONDS_CONVERSION_RATE / 10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

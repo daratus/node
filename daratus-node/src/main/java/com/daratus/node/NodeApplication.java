@@ -19,10 +19,10 @@ public class NodeApplication
         ScrapingHttpConnector scrappingConnector = new ScrapingHttpConnector();
         ObjectMapper mapper = new ObjectMapper();
         
-        NodeState initialState = new InitialState();
-        NodeState logedinState = new AuthenticatedState(initialState);
+        NodeState initialState = new AuthenticationState();
+        NodeState logedinState = new OperationalState(initialState);
         initialState.setNextState(logedinState);
-        NodeState runningState = new RunningState(initialState, logedinState);
+        NodeState runningState = new BlockedState(initialState, logedinState);
         logedinState.setNextState(runningState);
         
         NodeContext context = new NodeContext(apiConnector, scrappingConnector, mapper);

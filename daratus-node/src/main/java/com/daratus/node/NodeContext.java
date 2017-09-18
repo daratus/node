@@ -3,6 +3,7 @@ package com.daratus.node;
 import java.io.IOException;
 
 import com.daratus.node.console.APICommand;
+import com.daratus.node.domain.NullTask;
 import com.daratus.node.domain.Task;
 import com.daratus.node.domain.TaskObserver;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -22,12 +23,15 @@ public class NodeContext implements TaskObserver, Runnable{
     
     private String name = null;
     
-    private Task currentTask = null;
+    private Task currentTask;
+
+    private final Task nullTask = new NullTask();
     
     public NodeContext(APIConnector apiConnector, ScrapingConnector scrapingConnector, ObjectMapper mapper) {
         this.apiConnector = apiConnector;
         this.scrapingConnector = scrapingConnector;
         this.mapper = mapper;
+        setCurrentTask(nullTask);
     }
 
     public APIConnector getAPIConnector() {
@@ -51,7 +55,7 @@ public class NodeContext implements TaskObserver, Runnable{
         this.isRunning = isRunnig;
     }
     
-    public boolean isRunning(){
+    public boolean isBlocked(){
         return isRunning;
     }
     
@@ -85,7 +89,7 @@ public class NodeContext implements TaskObserver, Runnable{
     }
     
     public void getNextTask(String apiPath){
-        if(isAuthenticated()){
+        if(isAuthenticated() && !isBlocked()){
             String jsonResponse = apiConnector.sendRequest(apiPath + getName(), RequestMethod.GET);
             if(jsonResponse != null){
                 try {
@@ -104,12 +108,16 @@ public class NodeContext implements TaskObserver, Runnable{
     }
     
     public void setCurrentTask(Task currentTask) {
-        this.currentTask = currentTask;
+        if(currentTask != null){
+            this.currentTask = currentTask;
+        }else{
+            this.currentTask = nullTask;
+        }
         this.currentTask.addTaskObserver(this);
     }
     
     public void executeCurrentTask(){
-        if(isAuthenticated() && currentTask != null){
+        if(isAuthenticated() && !isBlocked() && currentTask != null){
             currentTask.execute(scrapingConnector);
         }else{
             System.out.println("No task is currently available! Or must login first!");
@@ -128,11 +136,13 @@ public class NodeContext implements TaskObserver, Runnable{
     public void notify(Task task) {
         if(task.isCompleted()){
             sendResponse(task);
+        }else if(isBlocked()){
+            getNextTask(APICommand.NEXT_TASK_PATH);
         }
     }
 
     public void run() {
-        while(isRunning()){
+        while(isBlocked()){
             executeCurrentTask();
         }
     }

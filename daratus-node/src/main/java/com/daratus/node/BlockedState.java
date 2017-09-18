@@ -1,12 +1,17 @@
 package com.daratus.node;
 
-public class RunningState extends NodeState{
+/**
+ * 
+ * @author Zilvinas Vaira
+ *
+ */
+public class BlockedState extends NodeState{
 
     private NodeState initialState;
 
     private NodeState logedinState;
     
-    public RunningState(NodeState initialState, NodeState logedinState) {
+    public BlockedState(NodeState initialState, NodeState logedinState) {
         this.initialState = initialState;
         this.logedinState = logedinState;
 
@@ -17,7 +22,7 @@ public class RunningState extends NodeState{
         if(!context.isAuthenticated()){
             context.setCurrentState(initialState);
             context.setRunning(false);
-        }else if(!context.isRunning()){
+        }else if(!context.isBlocked()){
             context.setCurrentState(logedinState);
         }
     }

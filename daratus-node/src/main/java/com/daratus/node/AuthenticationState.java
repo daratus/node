@@ -1,6 +1,11 @@
 package com.daratus.node;
 
-public class InitialState extends NodeState{
+/**
+ * 
+ * @author Zilvinas Vaira
+ *
+ */
+public class AuthenticationState extends NodeState{
 
     @Override
     public void handle(NodeContext context) {
