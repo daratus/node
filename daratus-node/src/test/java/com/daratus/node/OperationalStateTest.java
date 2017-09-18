@@ -38,13 +38,13 @@ public class OperationalStateTest {
     @Test
     public void testHandleNotAuthenticated() {
         operationalState.handle(context);
-        assertNotNull(context.getNodeState());
-        assertEquals(initialState, context.getNodeState());
+        assertNotNull(context.getCurrentState());
+        assertEquals(initialState, context.getCurrentState());
         
         context.setCurrentState(operationalState);
         operationalState.handle(context);
-        assertNotNull(context.getNodeState());
-        assertEquals(initialState, context.getNodeState());
+        assertNotNull(context.getCurrentState());
+        assertEquals(initialState, context.getCurrentState());
     }
     
     /**
@@ -55,13 +55,13 @@ public class OperationalStateTest {
         context.setName(originalName);
         context.setCurrentState(operationalState);
         operationalState.handle(context);
-        assertNotNull(context.getNodeState());
-        assertEquals(operationalState, context.getNodeState());
+        assertNotNull(context.getCurrentState());
+        assertEquals(operationalState, context.getCurrentState());
         
         context.setName(newName);
         operationalState.handle(context);
-        assertNotNull(context.getNodeState());
-        assertEquals(operationalState, context.getNodeState());
+        assertNotNull(context.getCurrentState());
+        assertEquals(operationalState, context.getCurrentState());
         assertEquals(originalName, context.getName());
     }
 
@@ -74,8 +74,8 @@ public class OperationalStateTest {
         context.setCurrentState(operationalState);
         context.setRunning(true);
         operationalState.handle(context);
-        assertNotNull(context.getNodeState());
-        assertEquals(operationalState, context.getNodeState());
+        assertNotNull(context.getCurrentState());
+        assertEquals(operationalState, context.getCurrentState());
     }
     
     /**
@@ -89,8 +89,8 @@ public class OperationalStateTest {
         context.setCurrentState(operationalState);
         context.setRunning(true);
         operationalState.handle(context);
-        assertNotNull(context.getNodeState());
-        assertEquals(blockedState, context.getNodeState());
+        assertNotNull(context.getCurrentState());
+        assertEquals(blockedState, context.getCurrentState());
         
         try {
             Thread.sleep(3 * NullTask.SECONDS_CONVERSION_RATE / 10);

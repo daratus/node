@@ -1,6 +1,7 @@
 package com.daratus.node.console;
 
 import com.daratus.node.NodeContext;
+import com.daratus.node.NodeState;
 
 public class TaskCommand extends AbstractCommand{
     
@@ -12,7 +13,8 @@ public class TaskCommand extends AbstractCommand{
     }
 
     public void execute() {
-        context.executeCurrentTask();
+        NodeState state = context.getCurrentState();
+        state.executeCurrentTask(context);
     }
     
 

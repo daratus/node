@@ -17,6 +17,10 @@ public abstract class NodeState {
         return nextState != null;
     }
     
+    public abstract void getNextTask(String apiPath, NodeContext context);
+    
+    public abstract void executeCurrentTask(NodeContext context);
+    
     public abstract void handle(NodeContext context);
 
 }

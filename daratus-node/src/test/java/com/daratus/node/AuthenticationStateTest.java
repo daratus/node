@@ -37,7 +37,7 @@ public class AuthenticationStateTest {
     @Test
     public void testHandleMissingCurrentState() {
         initialState.handle(context);
-        assertNull(context.getNodeState());
+        assertNull(context.getCurrentState());
     }
 
     /**
@@ -47,8 +47,8 @@ public class AuthenticationStateTest {
     public void testHandleMissingAuthentication() {
         context.setCurrentState(initialState);
         initialState.handle(context);
-        assertNotNull(context.getNodeState());
-        assertEquals(initialState, context.getNodeState());
+        assertNotNull(context.getCurrentState());
+        assertEquals(initialState, context.getCurrentState());
         
         // TODO Refactoring required for next task
         context.getNextTask(APICommand.NEXT_TASK_PATH);
@@ -64,8 +64,8 @@ public class AuthenticationStateTest {
         context.setCurrentState(initialState);
         context.setName(name);
         initialState.handle(context);
-        assertNotNull(context.getNodeState());
-        assertEquals(initialState, context.getNodeState());
+        assertNotNull(context.getCurrentState());
+        assertEquals(initialState, context.getCurrentState());
     }
     
     /**
@@ -77,8 +77,8 @@ public class AuthenticationStateTest {
         context.setName(name);
         initialState.setNextState(new OperationalState(initialState));
         initialState.handle(context);
-        assertNotNull(context.getNodeState());
-        assertNotEquals(initialState, context.getNodeState());
+        assertNotNull(context.getCurrentState());
+        assertNotEquals(initialState, context.getCurrentState());
     }
     
     /**

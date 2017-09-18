@@ -50,6 +50,9 @@ public class NodeContext implements TaskObserver, Runnable{
         this.currentState = state;
     }
     
+    public NodeState getCurrentState() {
+        return currentState;
+    }
     
     public void setRunning(boolean isRunnig){
         this.isRunning = isRunnig;
@@ -88,23 +91,23 @@ public class NodeContext implements TaskObserver, Runnable{
         this.name = null;
     }
     
-    public void getNextTask(String apiPath){
-        if(isAuthenticated() && !isBlocked()){
-            String jsonResponse = apiConnector.sendRequest(apiPath + getName(), RequestMethod.GET);
-            if(jsonResponse != null){
-                try {
-                    Task task = mapper.readValue(jsonResponse, Task.class);
-                    System.out.println("Got a task:");
-                    System.out.println(task.getClass().getSimpleName());
-                    System.out.println(task);
-                    setCurrentTask(task);
-                } catch (IOException e) {
-                    System.out.println("Could not read task from server!");
-                }
+    protected void getNextTask(String apiPath){
+        String jsonResponse = apiConnector.sendRequest(apiPath + getName(), RequestMethod.GET);
+        if(jsonResponse != null){
+            try {
+                Task task = mapper.readValue(jsonResponse, Task.class);
+                System.out.println("Got a task:");
+                System.out.println(task.getClass().getSimpleName());
+                System.out.println(task);
+                setCurrentTask(task);
+            } catch (IOException e) {
+                System.out.println("Could not read task from server!");
             }
-        }else{
-            System.out.println("Must login first!");
         }
+    }
+    
+    protected void executeCurrentTask(){
+        currentTask.execute(scrapingConnector);
     }
     
     public void setCurrentTask(Task currentTask) {
@@ -116,18 +119,11 @@ public class NodeContext implements TaskObserver, Runnable{
         this.currentTask.addTaskObserver(this);
     }
     
-    public void executeCurrentTask(){
-        if(isAuthenticated() && !isBlocked() && currentTask != null){
-            currentTask.execute(scrapingConnector);
-        }else{
-            System.out.println("No task is currently available! Or must login first!");
-        }
-    }
-    
     private void sendResponse(Task task){
         try {
             apiConnector.setJsonEntity("result", mapper.writeValueAsString(task));
             apiConnector.sendRequest(APICommand.NEXT_TASK_PATH + getName(), RequestMethod.POST);
+            setCurrentTask(nullTask);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }

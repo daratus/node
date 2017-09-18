@@ -1,10 +1,5 @@
 package com.daratus.node;
 
-import java.io.IOException;
-
-import com.daratus.node.domain.Task;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * 
  * @author Zilvinas Vaira
@@ -19,28 +14,11 @@ public class OperationalState extends NodeState{
     }
     
     public void getNextTask(String apiPath, NodeContext context){
-        APIConnector apiConnector = context.getAPIConnector();
-        ObjectMapper mapper = context.getMapper();
-        String jsonResponse = apiConnector.sendRequest(apiPath + context.getName(), RequestMethod.GET);
-        if(jsonResponse != null){
-            try {
-                Task task = mapper.readValue(jsonResponse, Task.class);
-                System.out.println("Got a task:");
-                System.out.println(task.getClass().getSimpleName());
-                System.out.println(task);
-                context.setCurrentTask(task);
-            } catch (IOException e) {
-                System.out.println("Could not read task from server!");
-            }
-        }
+        context.getNextTask(apiPath);
     }
 
     public void executeCurrentTask(NodeContext context){
-        if(context != null){
-            
-        }else{
-            System.out.println("No task is currently available! Or must login first!");
-        }
+        context.executeCurrentTask();
     }
     
     @Override

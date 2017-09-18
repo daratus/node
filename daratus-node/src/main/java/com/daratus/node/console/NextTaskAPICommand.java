@@ -1,6 +1,7 @@
 package com.daratus.node.console;
 
 import com.daratus.node.NodeContext;
+import com.daratus.node.NodeState;
 
 public class NextTaskAPICommand extends AbstractCommand implements APICommand{
 
@@ -15,7 +16,8 @@ public class NextTaskAPICommand extends AbstractCommand implements APICommand{
     }
 
     public void execute() {
-        context.getNextTask(apiPath);
+        NodeState state = context.getCurrentState();
+        state.getNextTask(apiPath, context);
     }
 
 }

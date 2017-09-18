@@ -42,19 +42,19 @@ public class BlockedStateTest {
     @Test
     public void testHandleMissingConstraints() {
         blockedState.handle(context);
-        assertNotNull(context.getNodeState());
-        assertEquals(initialState, context.getNodeState());
+        assertNotNull(context.getCurrentState());
+        assertEquals(initialState, context.getCurrentState());
 
         context.setCurrentState(blockedState);
         blockedState.handle(context);
-        assertNotNull(context.getNodeState());
-        assertEquals(initialState, context.getNodeState());
+        assertNotNull(context.getCurrentState());
+        assertEquals(initialState, context.getCurrentState());
         
         context.setCurrentState(blockedState);
         context.setName(originalName);
         blockedState.handle(context);
-        assertNotNull(context.getNodeState());
-        assertEquals(operationalState, context.getNodeState());
+        assertNotNull(context.getCurrentState());
+        assertEquals(operationalState, context.getCurrentState());
     }
     
     /**
@@ -66,13 +66,13 @@ public class BlockedStateTest {
         context.setName(originalName);
         context.setRunning(true);
         blockedState.handle(context);
-        assertNotNull(context.getNodeState());
-        assertEquals(blockedState, context.getNodeState());
+        assertNotNull(context.getCurrentState());
+        assertEquals(blockedState, context.getCurrentState());
         
         context.setName(newName);
         blockedState.handle(context);
-        assertNotNull(context.getNodeState());
-        assertEquals(blockedState, context.getNodeState());
+        assertNotNull(context.getCurrentState());
+        assertEquals(blockedState, context.getCurrentState());
         assertEquals(originalName, context.getName());
         
         // TODO Refactoring required for next task
@@ -90,13 +90,13 @@ public class BlockedStateTest {
         context.setName(originalName);
         context.setRunning(true);
         blockedState.handle(context);
-        assertNotNull(context.getNodeState());
-        assertEquals(blockedState, context.getNodeState());
+        assertNotNull(context.getCurrentState());
+        assertEquals(blockedState, context.getCurrentState());
         
         context.logout();
         blockedState.handle(context);
-        assertNotNull(context.getNodeState());
-        assertEquals(initialState, context.getNodeState());
+        assertNotNull(context.getCurrentState());
+        assertEquals(initialState, context.getCurrentState());
     }
 
     /**
@@ -109,8 +109,8 @@ public class BlockedStateTest {
         context.setName(originalName);
         context.setRunning(true);
         operationalState.handle(context);
-        assertNotNull(context.getNodeState());
-        assertEquals(blockedState, context.getNodeState());
+        assertNotNull(context.getCurrentState());
+        assertEquals(blockedState, context.getCurrentState());
         
         try {
             Thread.sleep(3 * NullTask.SECONDS_CONVERSION_RATE / 10);
@@ -120,8 +120,8 @@ public class BlockedStateTest {
         
         context.setRunning(false);
         blockedState.handle(context);
-        assertNotNull(context.getNodeState());
-        assertEquals(operationalState, context.getNodeState());
+        assertNotNull(context.getCurrentState());
+        assertEquals(operationalState, context.getCurrentState());
         
     }
     

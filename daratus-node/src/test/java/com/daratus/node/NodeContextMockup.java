@@ -8,10 +8,6 @@ public class NodeContextMockup extends NodeContext {
         super(null, null, null);
     }
     
-    public NodeState getNodeState(){
-        return currentState;
-    }
-    
     @Override
     public void run() {
         while(isBlocked()){

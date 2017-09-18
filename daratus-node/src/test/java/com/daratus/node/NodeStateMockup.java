@@ -8,8 +8,17 @@ public class NodeStateMockup extends NodeState {
     
     @Override
     public void handle(NodeContext context) {
-        // TODO Auto-generated method stub
+        // Do nothing
+    }
 
+    @Override
+    public void getNextTask(String apiPath, NodeContext context) {
+        // Do nothing
+    }
+
+    @Override
+    public void executeCurrentTask(NodeContext context) {
+        // Do nothing
     }
 
 }

@@ -18,6 +18,16 @@ public class BlockedState extends NodeState{
     }
     
     @Override
+    public void getNextTask(String apiPath, NodeContext context) {
+        System.out.println("Tasks are requested automatically! Can not get next task manually!");
+    }
+
+    @Override
+    public void executeCurrentTask(NodeContext context) {
+        System.out.println("Tasks are requested automatically! Can execute task manually!");
+    }
+    
+    @Override
     public void handle(NodeContext context) {
         if(!context.isAuthenticated()){
             context.setCurrentState(initialState);
