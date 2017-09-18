@@ -5,13 +5,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.apache.http.HttpHost;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClients;
 
 public class APIHttpConnector extends AbstractHttpConnector implements APIConnector{
 
@@ -32,6 +32,7 @@ public class APIHttpConnector extends AbstractHttpConnector implements APIConnec
     }
 
     public String sendRequest(String path, RequestMethod method) {
+        httpClient = HttpClients.createDefault();
         String responseToken = null;
         try {
             uriBuilder.setHost(target.getHostName());
@@ -64,16 +65,11 @@ public class APIHttpConnector extends AbstractHttpConnector implements APIConnec
             }
             
             responseToken = parseResponseContent(response);
-        } catch (URISyntaxException e) {
+            httpClient.close();
+        } catch (URISyntaxException | IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        } catch (ClientProtocolException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        } 
         
         return responseToken;
     }

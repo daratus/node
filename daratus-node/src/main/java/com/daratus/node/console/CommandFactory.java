@@ -23,6 +23,7 @@ public class CommandFactory {
         AbstractCommand command = unrecognizedCommand;
         if( commandPool.containsKey(commandToken)){
             command = commandPool.get(commandToken);
+            command.setParameters(commandParameters);
         }else{
             command = createCommand(commandParameters);
             commandPool.put(commandToken, command);
