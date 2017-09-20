@@ -30,7 +30,7 @@ public class NodeApplication
         
         Scanner scanner = new Scanner(System.in);
         CommandFactory factory = new CommandFactory(context);
-        AbstractCommand command = new DefaultCommand(AbstractCommand.HELP);
+        AbstractCommand command = new DefaultCommand(AbstractCommand.HELP, context);
         command.execute();
         while (! command.evaluate(AbstractCommand.EXIT)) {
             command = factory.createCommand(scanner.nextLine());
@@ -38,6 +38,6 @@ public class NodeApplication
             context.handleCurrentState();
         }
         scanner.close();
-         
+        
     }
 }

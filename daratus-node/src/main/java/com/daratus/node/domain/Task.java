@@ -10,6 +10,7 @@ import java.util.Random;
 import java.util.Map.Entry;
 
 import com.daratus.node.ScrapingConnector;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -46,22 +47,36 @@ public abstract class Task {
         this.targetURL = targetURL;
     }
     
+    public String getTargetURL() {
+        return targetURL;
+    }
+    
     public void setData(Map<String, String> data) {
         this.data = data;
+    }
+    
+    public Map<String, String> getData() {
+        return data;
     }
     
     public void setUrls(List<String> nextUrls) {
         this.urls = nextUrls;
     }
     
+    public List<String> getUrls() {
+        return urls;
+    }
+    
     protected void setCompleted(boolean isCompleted){
         this.isCompleted = isCompleted;
         Iterator<TaskObserver> iterator = taskObservers.iterator();
+        System.out.println("There are '" + taskObservers.size() + "' observers in place for task '" + this.getClass().getSimpleName() + "'!");
         while (iterator.hasNext()) {
             iterator.next().notify(this);
         }
     }
     
+    @JsonIgnore
     public boolean isCompleted(){
         return isCompleted;
     }

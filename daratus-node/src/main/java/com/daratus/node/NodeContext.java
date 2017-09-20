@@ -1,6 +1,7 @@
 package com.daratus.node;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import com.daratus.node.console.APICommand;
 import com.daratus.node.domain.NullTask;
@@ -27,10 +28,13 @@ public class NodeContext implements TaskObserver, Runnable{
 
     private final Task nullTask = new NullTask();
     
+    private Logger logger = Logger.getLogger(NodeContext.class.getSimpleName());
+    
     public NodeContext(APIConnector apiConnector, ScrapingConnector scrapingConnector, ObjectMapper mapper) {
         this.apiConnector = apiConnector;
         this.scrapingConnector = scrapingConnector;
         this.mapper = mapper;
+        nullTask.addTaskObserver(this);
         setCurrentTask(nullTask);
     }
 
@@ -96,6 +100,7 @@ public class NodeContext implements TaskObserver, Runnable{
         if(jsonResponse != null){
             try {
                 Task task = mapper.readValue(jsonResponse, Task.class);
+                task.addTaskObserver(this);
                 System.out.println("Got a task:");
                 System.out.println(task.getClass().getSimpleName());
                 System.out.println(task);
@@ -110,18 +115,24 @@ public class NodeContext implements TaskObserver, Runnable{
         currentTask.execute(scrapingConnector);
     }
     
+    protected void executeTaskLoop(){
+        while(isBlocked()){
+            executeCurrentTask();
+        }
+    }
+    
     public void setCurrentTask(Task currentTask) {
         if(currentTask != null){
             this.currentTask = currentTask;
         }else{
             this.currentTask = nullTask;
         }
-        this.currentTask.addTaskObserver(this);
     }
     
     private void sendResponse(Task task){
         try {
             apiConnector.setJsonEntity("result", mapper.writeValueAsString(task));
+            logger.info("Executing response!");
             apiConnector.sendRequest(APICommand.NEXT_TASK_PATH + getName(), RequestMethod.POST);
             setCurrentTask(nullTask);
         } catch (JsonProcessingException e) {
@@ -138,9 +149,7 @@ public class NodeContext implements TaskObserver, Runnable{
     }
 
     public void run() {
-        while(isBlocked()){
-            executeCurrentTask();
-        }
+        executeTaskLoop();
     }
     
 }

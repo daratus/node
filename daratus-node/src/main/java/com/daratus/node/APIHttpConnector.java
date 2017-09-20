@@ -3,6 +3,7 @@ package com.daratus.node;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.logging.Logger;
 
 import org.apache.http.HttpHost;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -21,6 +22,8 @@ public class APIHttpConnector extends AbstractHttpConnector implements APIConnec
     
     private String entityToken = "";
     
+    private Logger logger = Logger.getLogger(APIHttpConnector.class.getSimpleName());
+    
     public APIHttpConnector(String host, int port, String scheme) {
         super();
         uriBuilder = new URIBuilder();
@@ -28,7 +31,8 @@ public class APIHttpConnector extends AbstractHttpConnector implements APIConnec
     }
     
     public void setJsonEntity(String name, String json){
-        entityToken = name + "=" + json;
+        //entityToken = name + "=" + json;
+        entityToken = json;
     }
 
     public String sendRequest(String path, RequestMethod method) {
@@ -52,11 +56,15 @@ public class APIHttpConnector extends AbstractHttpConnector implements APIConnec
             case POST:
                 HttpPost postRequest = new HttpPost(uri);
                 postRequest.addHeader("accept", "application/json");
+                logger.info("Entity token is empty - '" + entityToken + "'!");
                 if(!entityToken.isEmpty()){
                     postRequest.setEntity(new StringEntity(entityToken, ContentType.APPLICATION_JSON));
                     entityToken = "";
                 }
+                logger.info("Sending POST to  uri " + postRequest.getURI() + "!");
+                logger.info("Sending POST using method " + postRequest.getMethod() + "!");
                 response = httpClient.execute(target, postRequest);
+                logger.info("Response " + response + "!");
                 break;
             case PUT:
                 break;

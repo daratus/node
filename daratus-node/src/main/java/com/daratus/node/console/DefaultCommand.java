@@ -1,22 +1,28 @@
 package com.daratus.node.console;
 
+import com.daratus.node.NodeContext;
+
 public class DefaultCommand extends AbstractCommand {
 
-    public DefaultCommand() {
-        super(null);
+    private NodeContext context;
+    
+    public DefaultCommand(NodeContext context) {
+        this(new String[] {}, context);
     }
 
-    public DefaultCommand(String [] commandParameters) {
+    public DefaultCommand(String [] commandParameters, NodeContext context) {
         super(commandParameters);
+        this.context = context;
     }
     
-    public DefaultCommand(String commandToken) {
-        super(new String[]{commandToken});
+    public DefaultCommand(String commandToken, NodeContext context) {
+        this(new String[]{commandToken}, context);
     }
 
     public void execute() {
         if(evaluate(AbstractCommand.HELP)){
             System.out.println("### Daratus Node v1.0 ###");
+            System.out.println(context.getCurrentState());
             System.out.println("#");
             System.out.println("# Available commands:");
             System.out.println("# " + AbstractCommand.REGISTER + " <name> - registers new node, name must be unique.");

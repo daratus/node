@@ -22,5 +22,5 @@ public abstract class NodeState {
     public abstract void executeCurrentTask(NodeContext context);
     
     public abstract void handle(NodeContext context);
-
+    
 }

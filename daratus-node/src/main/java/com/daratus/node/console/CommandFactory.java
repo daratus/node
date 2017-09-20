@@ -9,11 +9,12 @@ public class CommandFactory {
 
     private Map<String, AbstractCommand> commandPool = new HashMap<String, AbstractCommand>();
     
-    private DefaultCommand unrecognizedCommand = new DefaultCommand();
+    private DefaultCommand unrecognizedCommand;
     
     private NodeContext context;
     
     public CommandFactory(NodeContext context) {
+        unrecognizedCommand = new DefaultCommand(context);
         this.context = context;
     }
     
@@ -34,7 +35,7 @@ public class CommandFactory {
     private AbstractCommand createCommand(String [] commandParameters){
         String commandToken = commandParameters[0];
         if(commandToken.equals(AbstractCommand.HELP)){
-            return new DefaultCommand(commandParameters);
+            return new DefaultCommand(commandParameters, context);
         }else if(commandToken.equals(AbstractCommand.LOGIN)){
             return new NodeAPICommand(commandParameters, APICommand.NODE_PATH, context);
         }else if(commandToken.equals(AbstractCommand.LOGOUT)){
@@ -50,7 +51,7 @@ public class CommandFactory {
         }else if(commandToken.equals(AbstractCommand.STOP)){
             return new StartStopCommand(commandParameters, context, false);
         }else if(commandToken.equals(AbstractCommand.EXIT)){
-            return new DefaultCommand(commandParameters);
+            return new DefaultCommand(commandParameters, context);
         }else{
             return unrecognizedCommand;
         }

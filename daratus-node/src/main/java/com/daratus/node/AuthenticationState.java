@@ -25,5 +25,9 @@ public class AuthenticationState extends NodeState{
         }
     }
 
+    @Override
+    public String toString() {
+        return "No user is currently authenticated!";
+    }
 
 }
