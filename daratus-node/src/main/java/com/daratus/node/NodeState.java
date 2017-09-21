@@ -17,6 +17,8 @@ public abstract class NodeState {
         return nextState != null;
     }
     
+    public abstract String getGreeting(NodeContext context);
+    
     public abstract void getNextTask(String apiPath, NodeContext context);
     
     public abstract void executeCurrentTask(NodeContext context);

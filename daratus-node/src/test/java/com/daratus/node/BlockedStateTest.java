@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNotNull;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.daratus.node.console.APICommand;
 import com.daratus.node.domain.NullTask;
 
 /**
@@ -64,7 +63,7 @@ public class BlockedStateTest {
     public void testHandleBlockedState() {
         context.setCurrentState(blockedState);
         context.setName(originalName);
-        context.setRunning(true);
+        context.setBlocked(true);
         blockedState.handle(context);
         assertNotNull(context.getCurrentState());
         assertEquals(blockedState, context.getCurrentState());
@@ -83,7 +82,7 @@ public class BlockedStateTest {
     public void testHandleLogout() {
         context.setCurrentState(blockedState);
         context.setName(originalName);
-        context.setRunning(true);
+        context.setBlocked(true);
         blockedState.handle(context);
         assertNotNull(context.getCurrentState());
         assertEquals(blockedState, context.getCurrentState());
@@ -102,7 +101,7 @@ public class BlockedStateTest {
         context.setCurrentState(operationalState);
         operationalState.setNextState(blockedState);
         context.setName(originalName);
-        context.setRunning(true);
+        context.setBlocked(true);
         operationalState.handle(context);
         assertNotNull(context.getCurrentState());
         assertEquals(blockedState, context.getCurrentState());
@@ -113,7 +112,7 @@ public class BlockedStateTest {
             e.printStackTrace();
         }
         
-        context.setRunning(false);
+        context.setBlocked(false);
         blockedState.handle(context);
         assertNotNull(context.getCurrentState());
         assertEquals(operationalState, context.getCurrentState());

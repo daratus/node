@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 import com.daratus.node.console.APICommand;
+import com.daratus.node.console.AbstractCommand;
 import com.daratus.node.domain.NullTask;
 import com.daratus.node.domain.Task;
 import com.daratus.node.domain.TaskObserver;
@@ -20,7 +21,7 @@ public class NodeContext implements TaskObserver, Runnable{
     
     protected NodeState currentState = null;
     
-    private boolean isRunning = false;
+    private boolean isBlocked = false;
     
     private String name = null;
     
@@ -28,7 +29,7 @@ public class NodeContext implements TaskObserver, Runnable{
 
     private final Task nullTask = new NullTask();
     
-    private Logger logger = Logger.getLogger(NodeContext.class.getSimpleName());
+    private Logger logger;
     
     public NodeContext(APIConnector apiConnector, ScrapingConnector scrapingConnector, ObjectMapper mapper) {
         this.apiConnector = apiConnector;
@@ -36,6 +37,11 @@ public class NodeContext implements TaskObserver, Runnable{
         this.mapper = mapper;
         nullTask.addTaskObserver(this);
         setCurrentTask(nullTask);
+        logger = getLogger(this.getClass().getSimpleName());
+    }
+    
+    public Logger getLogger(String className){
+        return Logger.getLogger(className);
     }
 
     public APIConnector getAPIConnector() {
@@ -58,22 +64,27 @@ public class NodeContext implements TaskObserver, Runnable{
         return currentState;
     }
     
-    public void setRunning(boolean isRunnig){
-        this.isRunning = isRunnig;
+    public void setBlocked(boolean isBlocked){
+        if(!this.isBlocked && !isBlocked){
+            logger.warning("Can not execute stop command. It is already stoped!");
+        }
+        this.isBlocked = isBlocked;
     }
     
     public boolean isBlocked(){
-        return isRunning;
+        return isBlocked;
     }
     
     public void authenticate(String apiPath, String name){
         if(!isAuthenticated()){
+            System.out.println("Sending authetication request to Daratus API for node ID '" + name + "'!");
             String jsonResponse = apiConnector.sendRequest(apiPath + name, RequestMethod.GET);
             if(jsonResponse != null){
-                System.out.println("Got response!");
-                System.out.println(jsonResponse);
                 setName(name);
+                System.out.println("Found node ID '" + name + "' on server! Succesfuly authenticated!");
             }
+        }else{
+            logger.warning("User is already authenticated! Please use '" + AbstractCommand.LOGOUT + "' first!");
         }
     }
     
@@ -92,22 +103,28 @@ public class NodeContext implements TaskObserver, Runnable{
     }
     
     public void logout(){
-        this.name = null;
+        if(isAuthenticated()){
+            System.out.println("Succesfully loged out node ID '" + name + "'!");
+            this.name = null;
+        }else{
+            logger.warning("Could not logout! There is no node authenticated!");
+        }
     }
     
     protected void getNextTask(String apiPath){
+        System.out.println("Sending next taks request to Daratus API for node ID '" + name + "'!");
         String jsonResponse = apiConnector.sendRequest(apiPath + getName(), RequestMethod.GET);
         if(jsonResponse != null){
             try {
                 Task task = mapper.readValue(jsonResponse, Task.class);
                 task.addTaskObserver(this);
-                System.out.println("Got a task:");
-                System.out.println(task.getClass().getSimpleName());
-                System.out.println(task);
+                System.out.println("Got a task '" + task.getClass().getSimpleName() + "' with target URL '" + task + "' from server!");
                 setCurrentTask(task);
             } catch (IOException e) {
-                System.out.println("Could not read task from server!");
+                logger.warning("Could not read task from server!");
             }
+        }else{
+            logger.warning("No response from server!");
         }
     }
     
@@ -131,10 +148,11 @@ public class NodeContext implements TaskObserver, Runnable{
     
     private void sendResponse(Task task){
         try {
-            apiConnector.setJsonEntity("result", mapper.writeValueAsString(task));
-            logger.info("Executing response!");
+            apiConnector.setJsonEntity(mapper.writeValueAsString(task));
+            logger.info("Sending task result response to Daratus API to path '" + APICommand.NEXT_TASK_PATH + getName() + "'!");
             apiConnector.sendRequest(APICommand.NEXT_TASK_PATH + getName(), RequestMethod.POST);
             setCurrentTask(nullTask);
+            logger.info("Result has been sent!");
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }

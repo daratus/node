@@ -30,8 +30,7 @@ public class APIHttpConnector extends AbstractHttpConnector implements APIConnec
         target = new HttpHost(host, port, scheme);
     }
     
-    public void setJsonEntity(String name, String json){
-        //entityToken = name + "=" + json;
+    public void setJsonEntity(String json){
         entityToken = json;
     }
 
@@ -50,21 +49,22 @@ public class APIHttpConnector extends AbstractHttpConnector implements APIConnec
             case GET:
                 HttpGet getRequest = new HttpGet(uri);
                 getRequest.addHeader("accept", "application/json");
-                System.out.println(getRequest.getRequestLine());
+                logger.info("Sending GET request to Daratus API path '" + path + "' for host '" + uriBuilder.getHost() + "'!");
                 response = httpClient.execute(getRequest);
+                logger.info("Got response! Status is '" + response.getStatusLine() + "'!");
                 break;
             case POST:
                 HttpPost postRequest = new HttpPost(uri);
                 postRequest.addHeader("accept", "application/json");
-                logger.info("Entity token is empty - '" + entityToken + "'!");
                 if(!entityToken.isEmpty()){
                     postRequest.setEntity(new StringEntity(entityToken, ContentType.APPLICATION_JSON));
                     entityToken = "";
+                }else{
+                    logger.warning("Post data is empty!");
                 }
-                logger.info("Sending POST to  uri " + postRequest.getURI() + "!");
-                logger.info("Sending POST using method " + postRequest.getMethod() + "!");
+                logger.info("Sending POST request to Daratus API path '" + path + "' for host '" + uriBuilder.getHost() + "'!");
                 response = httpClient.execute(target, postRequest);
-                logger.info("Response " + response + "!");
+                logger.info("Got response! Status is '" + response.getStatusLine() + "'!");
                 break;
             case PUT:
                 break;
@@ -74,8 +74,8 @@ public class APIHttpConnector extends AbstractHttpConnector implements APIConnec
             
             responseToken = parseResponseContent(response);
             httpClient.close();
+            
         } catch (URISyntaxException | IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } 
         

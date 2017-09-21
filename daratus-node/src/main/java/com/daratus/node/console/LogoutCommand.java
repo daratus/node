@@ -2,6 +2,11 @@ package com.daratus.node.console;
 
 import com.daratus.node.NodeContext;
 
+/**
+ * 
+ * @author Zilvinas Vaira
+ *
+ */
 public class LogoutCommand extends AbstractCommand {
 
     private NodeContext context;

@@ -72,7 +72,7 @@ public class OperationalStateTest {
     public void testHandleMissingBlockedState() {
         context.setName(originalName);
         context.setCurrentState(operationalState);
-        context.setRunning(true);
+        context.setBlocked(true);
         operationalState.handle(context);
         assertNotNull(context.getCurrentState());
         assertEquals(operationalState, context.getCurrentState());
@@ -87,7 +87,7 @@ public class OperationalStateTest {
         operationalState.setNextState(blockedState);
         context.setName(originalName);
         context.setCurrentState(operationalState);
-        context.setRunning(true);
+        context.setBlocked(true);
         operationalState.handle(context);
         assertNotNull(context.getCurrentState());
         assertEquals(blockedState, context.getCurrentState());
@@ -98,7 +98,7 @@ public class OperationalStateTest {
             e.printStackTrace();
         }
         
-        context.setRunning(false);
+        context.setBlocked(false);
     }
 
 }

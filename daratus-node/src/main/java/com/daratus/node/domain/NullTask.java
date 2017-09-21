@@ -31,11 +31,13 @@ public class NullTask extends Task {
     
     @Override
     public void execute(ScrapingConnector connector) {
+        logger.info("Sleeping for " + sleepInterval + " seconds...");
         try {
             Thread.sleep(sleepInterval * SECONDS_CONVERSION_RATE);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        logger.info("Done sleeping!");
         setCompleted(false);
     }
 

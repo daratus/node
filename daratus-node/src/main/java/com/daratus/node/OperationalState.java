@@ -1,5 +1,7 @@
 package com.daratus.node;
 
+import java.util.logging.Logger;
+
 /**
  * 
  * @author Zilvinas Vaira
@@ -33,7 +35,6 @@ public class OperationalState extends NodeState{
                     contextThread = new Thread(context);
                     return true;
                 } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                     return false;
                 }
@@ -53,9 +54,15 @@ public class OperationalState extends NodeState{
                 context.setCurrentState(nextState);
                 contextThread.start();
             }else{
-                System.out.println("Previous task is not finished yet! Aborting ...");
+                Logger logger = context.getLogger(this.getClass().getSimpleName());
+                logger.warning("Previous automatic execution is not yet stopped! Please wait while it ends. Aborting ...");
             }
         }
+    }
+    
+    @Override
+    public String getGreeting(NodeContext context) {
+        return "Node ID is '" + context.getName() + "'! Node is ready for the commands!";
     }
 
 }

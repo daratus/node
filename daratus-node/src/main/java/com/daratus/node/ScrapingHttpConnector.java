@@ -15,7 +15,6 @@ public class ScrapingHttpConnector extends AbstractHttpConnector implements Scra
         String responseToken = null;
         try {
             HttpGet getRequest = new HttpGet(new URI(uriToken));
-            System.out.println(getRequest.getRequestLine());
             CloseableHttpResponse response = httpClient.execute(getRequest);
             responseToken = parseResponseContent(response);
             httpClient.close();

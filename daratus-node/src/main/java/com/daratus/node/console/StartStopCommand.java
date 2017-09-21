@@ -15,7 +15,7 @@ public class StartStopCommand extends AbstractCommand {
     }
 
     public void execute() {
-        context.setRunning(isRunnig);
+        context.setBlocked(isRunnig);
     }
 
 }

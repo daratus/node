@@ -9,8 +9,6 @@ import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.daratus.node.console.APICommand;
-
 /**
  * 
  * 
@@ -82,7 +80,7 @@ public class AuthenticationStateTest {
     @Test
     public void testHandleFailedOperational(){
         context.setCurrentState(initialState);
-        context.setRunning(true);
+        context.setBlocked(true);
         initialState.handle(context);
         assertFalse(context.isBlocked());
     }

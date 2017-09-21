@@ -1,6 +1,7 @@
 package com.daratus.node.console;
 
 import com.daratus.node.NodeContext;
+import com.daratus.node.NodeState;
 
 public class DefaultCommand extends AbstractCommand {
 
@@ -21,8 +22,9 @@ public class DefaultCommand extends AbstractCommand {
 
     public void execute() {
         if(evaluate(AbstractCommand.HELP)){
+            NodeState currentState = context.getCurrentState();
             System.out.println("### Daratus Node v1.0 ###");
-            System.out.println(context.getCurrentState());
+            System.out.println("# Current node state: " + currentState.getGreeting(context));
             System.out.println("#");
             System.out.println("# Available commands:");
             System.out.println("# " + AbstractCommand.REGISTER + " <name> - registers new node, name must be unique.");
@@ -38,7 +40,9 @@ public class DefaultCommand extends AbstractCommand {
             System.out.println("# Automatic execution commands:");
             System.out.println("# " + AbstractCommand.START + " starts automatic tasks execution.");
             System.out.println("# " + AbstractCommand.STOP + " stops automatic tasks execution.");
-        }else if(!evaluate(AbstractCommand.EXIT)){
+        }else if(evaluate(AbstractCommand.EXIT)){
+            System.out.println("Bye Bye...!");
+        }else{
             System.out.println("Unrecognized command!");
         }
     }

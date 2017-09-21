@@ -8,6 +8,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Random;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 import com.daratus.node.ScrapingConnector;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -39,6 +40,8 @@ public abstract class Task {
     private boolean isCompleted = false;
     
     private List<TaskObserver> taskObservers = new ArrayList<TaskObserver>();
+    
+    protected Logger logger = Logger.getLogger(this.getClass().getSimpleName());
 
     @Deprecated
     private Random randomizer = new Random();
@@ -70,7 +73,6 @@ public abstract class Task {
     protected void setCompleted(boolean isCompleted){
         this.isCompleted = isCompleted;
         Iterator<TaskObserver> iterator = taskObservers.iterator();
-        System.out.println("There are '" + taskObservers.size() + "' observers in place for task '" + this.getClass().getSimpleName() + "'!");
         while (iterator.hasNext()) {
             iterator.next().notify(this);
         }

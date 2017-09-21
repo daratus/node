@@ -1,5 +1,9 @@
 package com.daratus.node;
 
+import java.util.logging.Logger;
+
+import com.daratus.node.console.AbstractCommand;
+
 /**
  * 
  * @author Zilvinas Vaira
@@ -19,22 +23,29 @@ public class BlockedState extends NodeState{
     
     @Override
     public void getNextTask(String apiPath, NodeContext context) {
-        System.out.println("Tasks are requested automatically! Can not get next task manually!");
+        Logger logger = context.getLogger(this.getClass().getSimpleName());
+        logger.warning(getGreeting(context) + " Can not get next task manually!");
     }
 
     @Override
     public void executeCurrentTask(NodeContext context) {
-        System.out.println("Tasks are requested automatically! Can execute task manually!");
+        Logger logger = context.getLogger(this.getClass().getSimpleName());
+        logger.warning(getGreeting(context) + " Can execute task manually!");
     }
     
     @Override
     public void handle(NodeContext context) {
         if(!context.isAuthenticated()){
             context.setCurrentState(initialState);
-            context.setRunning(false);
+            context.setBlocked(false);
         }else if(!context.isBlocked()){
             context.setCurrentState(logedinState);
         }
+    }
+
+    @Override
+    public String getGreeting(NodeContext context) {
+        return "Node ID is '" + context.getName() + "'! Node is operating automaticaly. In order to break the loop use '"+AbstractCommand.STOP+"' command!";
     }
 
 }

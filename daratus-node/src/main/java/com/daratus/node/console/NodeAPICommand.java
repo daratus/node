@@ -1,5 +1,7 @@
 package com.daratus.node.console;
 
+import java.util.logging.Logger;
+
 import com.daratus.node.NodeContext;
 
 /**
@@ -24,6 +26,7 @@ public class NodeAPICommand extends AbstractParametrizedCommand implements APICo
      */
     protected String apiPath = "";
 
+    protected Logger logger;
     
     /**
      * 
@@ -35,6 +38,7 @@ public class NodeAPICommand extends AbstractParametrizedCommand implements APICo
         super(commandParameters);
         this.apiPath = apiPath;
         this.context = context;
+        logger = context.getLogger(this.getClass().getSimpleName());
     }
 
     @Override
@@ -42,13 +46,16 @@ public class NodeAPICommand extends AbstractParametrizedCommand implements APICo
         if(commandParameters.length > 1){
             name = commandParameters[1];
         }else{
-            System.out.println("Some of the required parameters are missing!");
+            String commandToken = commandParameters.length > 0 ? commandParameters[0] : "unknown";
+            logger.warning("Required parameter is missing for command '" + commandToken + "'!");
         }
     }
     
     @Override
     public void doExecute() {
-        context.authenticate(apiPath, name);
+        if(commandParameters.length > 1){
+            context.authenticate(apiPath, name);
+        }
     }
 
 }

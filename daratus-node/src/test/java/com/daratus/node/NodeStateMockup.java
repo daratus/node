@@ -21,4 +21,9 @@ public class NodeStateMockup extends NodeState {
         // Do nothing
     }
 
+    @Override
+    public String getGreeting(NodeContext context) {
+        return "Tests mode!";
+    }
+
 }
