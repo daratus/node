@@ -36,6 +36,8 @@ public class CommandFactory {
         String commandToken = commandParameters[0];
         if(commandToken.equals(AbstractCommand.HELP)){
             return new DefaultCommand(commandParameters, context);
+        }else if(commandToken.equals(AbstractCommand.HOST)){
+            return new HostCommand(commandParameters, context);
         }else if(commandToken.equals(AbstractCommand.LOGIN)){
             return new NodeAPICommand(commandParameters, APICommand.NODE_PATH, context);
         }else if(commandToken.equals(AbstractCommand.LOGOUT)){

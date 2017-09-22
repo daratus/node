@@ -67,6 +67,8 @@ public class NodeContext implements TaskObserver, Runnable{
     public void setBlocked(boolean isBlocked){
         if(!this.isBlocked && !isBlocked){
             logger.warning("Can not execute stop command. It is already stoped!");
+        }else if(!isBlocked){
+            System.out.println("Stop request queued... please wait!");
         }
         this.isBlocked = isBlocked;
     }
@@ -134,8 +136,11 @@ public class NodeContext implements TaskObserver, Runnable{
     
     protected void executeTaskLoop(){
         while(isBlocked()){
+            System.out.println();
+            System.out.println("...looping...");
             executeCurrentTask();
         }
+        System.out.println("Task loop has been stopped succesfully!");
     }
     
     public void setCurrentTask(Task currentTask) {
@@ -149,10 +154,10 @@ public class NodeContext implements TaskObserver, Runnable{
     private void sendResponse(Task task){
         try {
             apiConnector.setJsonEntity(mapper.writeValueAsString(task));
-            logger.info("Sending task result response to Daratus API to path '" + APICommand.NEXT_TASK_PATH + getName() + "'!");
+            System.out.println("Sending task result response to Daratus API to path '" + APICommand.NEXT_TASK_PATH + getName() + "'!");
             apiConnector.sendRequest(APICommand.NEXT_TASK_PATH + getName(), RequestMethod.POST);
             setCurrentTask(nullTask);
-            logger.info("Result has been sent!");
+            System.out.println("Result has been sent!");
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }

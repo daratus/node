@@ -1,5 +1,8 @@
 package com.daratus.node.console;
 
+import org.apache.http.HttpHost;
+
+import com.daratus.node.APIConnector;
 import com.daratus.node.NodeContext;
 import com.daratus.node.NodeState;
 
@@ -23,13 +26,17 @@ public class DefaultCommand extends AbstractCommand {
     public void execute() {
         if(evaluate(AbstractCommand.HELP)){
             NodeState currentState = context.getCurrentState();
+            APIConnector apiConnector = context.getAPIConnector();
+            HttpHost host = apiConnector.getHost();
             System.out.println("### Daratus Node v1.0 ###");
             System.out.println("# Current node state: " + currentState.getGreeting(context));
+            System.out.println("# Current host details: " + host.toURI());
             System.out.println("#");
             System.out.println("# Available commands:");
             System.out.println("# " + AbstractCommand.REGISTER + " <name> - registers new node, name must be unique.");
             System.out.println("# " + AbstractCommand.LOGIN + " <id> - logins with existing node.");
             System.out.println("# " + AbstractCommand.LOGOUT + " - logouts current node.");
+            System.out.println("# " + AbstractCommand.HOST + " <host> <port> <scheme> - updates Daratus API host details.");
             System.out.println("# " + AbstractCommand.HELP + " - prints title and available commands.");
             System.out.println("# " + AbstractCommand.EXIT + " - quits the program.");
             System.out.println("#");

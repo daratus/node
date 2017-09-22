@@ -3,7 +3,6 @@ package com.daratus.node;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.logging.Logger;
 
 import org.apache.http.HttpHost;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -22,12 +21,10 @@ public class APIHttpConnector extends AbstractHttpConnector implements APIConnec
     
     private String entityToken = "";
     
-    private Logger logger = Logger.getLogger(APIHttpConnector.class.getSimpleName());
-    
     public APIHttpConnector(String host, int port, String scheme) {
         super();
         uriBuilder = new URIBuilder();
-        target = new HttpHost(host, port, scheme);
+        setHostDetails(host, port, scheme);
     }
     
     public void setJsonEntity(String json){
@@ -80,6 +77,16 @@ public class APIHttpConnector extends AbstractHttpConnector implements APIConnec
         } 
         
         return responseToken;
+    }
+
+    @Override
+    public void setHostDetails(String host, int port, String scheme) {
+        target = new HttpHost(host, port, scheme);
+    }
+
+    @Override
+    public HttpHost getHost() {
+        return target;
     }
     
 }

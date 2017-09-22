@@ -6,8 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Random;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.logging.Logger;
 
 import com.daratus.node.ScrapingConnector;
@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
     @Type(value = GetData.class),
+    @Type(value = GetDataProxy.class),
     @Type(value = GetUrls.class),
     @Type(value = NullTask.class)
 })

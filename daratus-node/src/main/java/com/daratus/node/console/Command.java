@@ -1,10 +1,17 @@
 package com.daratus.node.console;
 
+/**
+ * 
+ * @author Zilvinas Vaira
+ *
+ */
 public interface Command {
     
     public static final String EXIT = "exit";
     
     public static final String HELP = "help";
+
+    public static final String HOST = "host";
     
     public static final String LOGIN = "login";
     
