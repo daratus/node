@@ -9,6 +9,15 @@ import com.daratus.node.ScrapingConnector;
  */
 public class GetData extends Task {
     
+    public GetData() { }
+
+    public GetData(GetDataProxy proxy) {
+        this.targetURL = proxy.targetURL;
+        this.data = proxy.data;
+        this.urls = proxy.urls;
+        this.isCompleted = proxy.isCompleted;
+    }
+    
     @Override
     public void execute(ScrapingConnector connector){
         System.out.println("Executing '" + this.getClass().getSimpleName() + "' command...");

@@ -38,7 +38,7 @@ public abstract class Task {
     
     protected List<String> urls = new ArrayList<String>();
     
-    private boolean isCompleted = false;
+    protected boolean isCompleted = false;
     
     private List<TaskObserver> taskObservers = new ArrayList<TaskObserver>();
     
@@ -73,9 +73,13 @@ public abstract class Task {
     
     protected void setCompleted(boolean isCompleted){
         this.isCompleted = isCompleted;
+        notifyObservers(this);
+    }
+    
+    protected void notifyObservers(Task task){
         Iterator<TaskObserver> iterator = taskObservers.iterator();
         while (iterator.hasNext()) {
-            iterator.next().notify(this);
+            iterator.next().notify(task);
         }
     }
     
