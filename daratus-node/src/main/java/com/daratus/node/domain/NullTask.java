@@ -11,7 +11,7 @@ public class NullTask extends Task {
 
     public static final long SECONDS_CONVERSION_RATE = 1000L;
     
-    private int sleepInterval = 10;
+    private int sleepInterval = 3;
     
     /**
      * 
