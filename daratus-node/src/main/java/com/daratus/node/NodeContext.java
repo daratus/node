@@ -3,6 +3,10 @@ package com.daratus.node;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import javax.xml.xpath.XPath;
+
+import org.jsoup.helper.W3CDom;
+
 import com.daratus.node.console.APICommand;
 import com.daratus.node.console.AbstractCommand;
 import com.daratus.node.domain.NullTask;
@@ -19,6 +23,10 @@ public class NodeContext implements TaskObserver, Runnable{
 
     private ObjectMapper mapper;
     
+    private W3CDom w3cDom;
+    
+    private XPath xPath;
+    
     protected NodeState currentState = null;
     
     private boolean isBlocked = false;
@@ -31,10 +39,12 @@ public class NodeContext implements TaskObserver, Runnable{
     
     private Logger logger;
     
-    public NodeContext(APIConnector apiConnector, ScrapingConnector scrapingConnector, ObjectMapper mapper) {
+    public NodeContext(APIConnector apiConnector, ScrapingConnector scrapingConnector, ObjectMapper mapper, W3CDom w3cDom, XPath xPath) {
         this.apiConnector = apiConnector;
         this.scrapingConnector = scrapingConnector;
         this.mapper = mapper;
+        this.w3cDom = w3cDom;
+        this.xPath = xPath;
         nullTask.addTaskObserver(this);
         setCurrentTask(nullTask);
         logger = getLogger(this.getClass().getSimpleName());
@@ -48,8 +58,20 @@ public class NodeContext implements TaskObserver, Runnable{
         return apiConnector;
     }
     
+    public ScrapingConnector getScrapingConnector() {
+        return scrapingConnector;
+    }
+    
     public ObjectMapper getMapper() {
         return mapper;
+    }
+    
+    public W3CDom getW3cDom() {
+        return w3cDom;
+    }
+    
+    public XPath getxPath() {
+        return xPath;
     }
     
     public void handleCurrentState(){
@@ -131,7 +153,7 @@ public class NodeContext implements TaskObserver, Runnable{
     }
     
     protected void executeCurrentTask(){
-        currentTask.execute(scrapingConnector);
+        currentTask.execute(this);
     }
     
     protected void executeTaskLoop(){

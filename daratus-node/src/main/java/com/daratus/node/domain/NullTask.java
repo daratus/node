@@ -1,6 +1,6 @@
 package com.daratus.node.domain;
 
-import com.daratus.node.ScrapingConnector;
+import com.daratus.node.NodeContext;
 
 /**
  * 
@@ -30,7 +30,7 @@ public class NullTask extends Task {
     }
     
     @Override
-    public void execute(ScrapingConnector connector) {
+    public void execute(NodeContext context) {
         logger.info("Sleeping for " + sleepInterval + " seconds...");
         try {
             Thread.sleep(sleepInterval * SECONDS_CONVERSION_RATE);
