@@ -1,6 +1,8 @@
 package com.daratus.node.domain;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -15,6 +17,8 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URIBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.helper.W3CDom;
 import org.w3c.dom.Document;
@@ -156,9 +160,34 @@ public abstract class Task {
                     
                     String hrefAttribute = element.getAttribute("href");
                     if(!hrefAttribute.isEmpty()){
-                        iterator.set(hrefAttribute);
-                        currentUrlHasChanges = urlsHaveChanges = true;
-                        break;
+                        if(hrefAttribute.contains("http")){
+                            iterator.set(hrefAttribute);
+                            currentUrlHasChanges = urlsHaveChanges = true;
+                            break;
+                        }else{
+                            try {
+                                URIBuilder hrefBuilder = new URIBuilder(hrefAttribute);
+                                URIBuilder targetBuilder = new URIBuilder(targetURL);
+                                targetBuilder.clearParameters();
+                                
+                                String path = hrefBuilder.getPath();
+                                if(!path.isEmpty()){
+                                    targetBuilder.setPath(path);
+                                }
+                                
+                                List<NameValuePair> queryParams = hrefBuilder.getQueryParams();
+                                if(!queryParams.isEmpty()){
+                                    targetBuilder.setParameters(queryParams);
+                                }
+                                
+                                URI hrefURI = targetBuilder.build();
+                                iterator.set(hrefURI.toString());
+                                currentUrlHasChanges = urlsHaveChanges = true;
+                                break;
+                            } catch (URISyntaxException e) {
+                                logger.warning("Incorect target URI expression!");
+                            }
+                        }
                     }
                 }
                 if(!currentUrlHasChanges){
