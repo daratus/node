@@ -1,4 +1,4 @@
-package com.daratus.node;
+package com.daratus.node.console;
 
 import java.util.Scanner;
 
@@ -7,16 +7,20 @@ import javax.xml.xpath.XPathFactory;
 
 import org.jsoup.helper.W3CDom;
 
-import com.daratus.node.console.AbstractCommand;
-import com.daratus.node.console.CommandFactory;
-import com.daratus.node.console.DefaultCommand;
+import com.daratus.node.APIHttpConnector;
+import com.daratus.node.AuthenticationState;
+import com.daratus.node.BlockedState;
+import com.daratus.node.NodeContext;
+import com.daratus.node.NodeState;
+import com.daratus.node.OperationalState;
+import com.daratus.node.ScrapingHttpConnector;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Hello world!
  *
  */
-public class NodeApplication {
+public class ConsoleApplication {
     public static void main(String[] args) {
 
         APIHttpConnector apiConnector = new APIHttpConnector("86.100.97.40", 8080, "http");

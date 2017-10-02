@@ -28,7 +28,7 @@ public class DefaultCommand extends AbstractCommand {
             NodeState currentState = context.getCurrentState();
             APIConnector apiConnector = context.getAPIConnector();
             HttpHost host = apiConnector.getHost();
-            System.out.println("### Daratus Node v1.0 ###");
+            System.out.println("### Daratus Node v0.0.2 ###");
             System.out.println("# Current node state: " + currentState.getGreeting(context));
             System.out.println("# Current host details: " + host.toURI());
             System.out.println("#");
