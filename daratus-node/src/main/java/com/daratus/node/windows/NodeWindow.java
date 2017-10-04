@@ -13,12 +13,19 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.EnumMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
 import com.daratus.node.NodeContext;
+import com.daratus.node.NodeState;
+import com.daratus.node.ContextObserver;
+import com.daratus.node.NodeCommand;
+import com.daratus.node.console.APICommand;
 import com.daratus.node.listeners.ApplicationExitListener;
 import com.daratus.node.listeners.LoginListener;
 import com.daratus.node.listeners.LogoutListener;
@@ -29,12 +36,13 @@ import com.daratus.node.listeners.TrayMouseListener;
  * Main application window type
  * 
  * @author Zilvinas Vaira
- * @copyright Copyright (c) 2016, RevRevDev LLC
  *
  */
-public class NodeWindow extends JFrame {
+public class NodeWindow extends JFrame implements ContextObserver{
 
     private static final long serialVersionUID = 1001L;
+    
+    private NodeContext context;
 
     private PopupMenu popupMenu;
 
@@ -42,7 +50,7 @@ public class NodeWindow extends JFrame {
 
     private SystemTray systemTray;
 
-    private Map<MenuSlot, MenuItem> menus = new EnumMap<MenuSlot, MenuItem>(MenuSlot.class);
+    private Map<NodeCommand, MenuItem> menus = new EnumMap<NodeCommand, MenuItem>(NodeCommand.class);
 
     /**
      * Initiates main states, controls and listeners
@@ -51,6 +59,8 @@ public class NodeWindow extends JFrame {
      */
     public NodeWindow(String title, NodeContext context) {
         super(title);
+        this.context = context;
+        context.addContextObserver(this);
 
         ApplicationExitListener exitListener = new ApplicationExitListener(this);
         this.addWindowListener(exitListener);
@@ -58,19 +68,19 @@ public class NodeWindow extends JFrame {
         if (SystemTray.isSupported()) {
             Image iconImage;
             try {
-                iconImage = createImage("images/tray-d.png", "tray icon");
+                iconImage = createImage("images/tray.png", "tray icon");
                 trayIcon = new TrayIcon(iconImage);
                 systemTray = SystemTray.getSystemTray();
                 popupMenu = new PopupMenu();
 
                 // MENU
-                addTrayMenuItem(MenuSlot.LOGIN, "Login", new LoginListener());
-                addTrayMenuItem(MenuSlot.LOGOUT, "Logout", new LogoutListener(context));
+                addTrayMenuItem(NodeCommand.LOGIN, "Login", new LoginListener(APICommand.NODE_PATH, context));
+                addTrayMenuItem(NodeCommand.LOGOUT, "Logout", new LogoutListener(context));
                 addTrayMenuItem("Node Info");
                 popupMenu.addSeparator();
 
-                addTrayMenuItem(MenuSlot.START, "Start", new StartStopListener(context, true));
-                addTrayMenuItem(MenuSlot.STOP, "Stop", new StartStopListener(context, false));
+                addTrayMenuItem(NodeCommand.START, "Start", new StartStopListener(context, true));
+                addTrayMenuItem(NodeCommand.STOP, "Stop", new StartStopListener(context, false));
                 popupMenu.addSeparator();
 
                 MenuItem exitItem = addTrayMenuItem("Exit");
@@ -102,7 +112,7 @@ public class NodeWindow extends JFrame {
      * @param title
      * @return
      */
-    private MenuItem addTrayMenuItem(MenuSlot menuSlot, String title, ActionListener listener) {
+    private MenuItem addTrayMenuItem(NodeCommand menuSlot, String title, ActionListener listener) {
         MenuItem menuItem = addTrayMenuItem(title);
         menuItem.setEnabled(false);
         menuItem.addActionListener(listener);
@@ -164,8 +174,23 @@ public class NodeWindow extends JFrame {
      * Closes the application
      */
     public void exit() {
-        this.dispose();
+        context.exit();
+        dispose();
         System.exit(0);
+    }
+
+    @Override
+    public void notify(NodeContext context) {
+        NodeState currentState = context.getCurrentState();
+        Set<NodeCommand> enabledCommands = currentState.getEnabledCommands();
+        Set<Entry<NodeCommand, MenuItem>> entrySet = menus.entrySet();
+        Iterator<Entry<NodeCommand, MenuItem>> iterator =  entrySet.iterator();
+        while (iterator.hasNext()) {
+            Entry<NodeCommand, MenuItem> entry = iterator.next();
+            NodeCommand nodeCommand = entry.getKey();
+            MenuItem menuItem = entry.getValue();
+            menuItem.setEnabled(enabledCommands.contains(nodeCommand));
+        }
     }
 
 }

@@ -38,12 +38,12 @@ public class NodeThread implements Runnable {
         logedinState.setNextState(runningState);
 
         NodeContext context = new NodeContext(apiConnector, scrappingConnector, mapper, w3cDom, xPath);
+        NodeWindow window = new NodeWindow("Daratus Node v0.0.2", context);
+
         context.setCurrentState(initialState);
 
-        NodeWindow window = new NodeWindow("Daratus Node v0.0.2", null);
-        
         //JFrame window = new JFrame("Daratus Node v0.0.2");
-
+        
         window.setLocationRelativeTo(null);
         window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         window.getContentPane().setBackground(Color.WHITE);

@@ -16,6 +16,7 @@ public class LogoutListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         context.logout();
+        context.handleCurrentState();
     }
 
 }

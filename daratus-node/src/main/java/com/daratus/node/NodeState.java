@@ -1,5 +1,7 @@
 package com.daratus.node;
 
+import java.util.Set;
+
 /**
  * 
  * @author Zilvinas Vaira
@@ -18,6 +20,8 @@ public abstract class NodeState {
     }
     
     public abstract String getGreeting(NodeContext context);
+    
+    public abstract Set<NodeCommand> getEnabledCommands();
     
     public abstract void getNextTask(String apiPath, NodeContext context);
     

@@ -1,5 +1,7 @@
 package com.daratus.node;
 
+import java.util.EnumSet;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -12,6 +14,16 @@ public class OperationalState extends NodeState{
     private NodeState initialState;
     
     private Thread contextThread = null;
+    
+    private Set<NodeCommand> enabledCommands = EnumSet.of(
+            NodeCommand.EXIT, 
+            NodeCommand.HELP, 
+            NodeCommand.LOGOUT,
+            NodeCommand.NEXT,
+            NodeCommand.EXECUTE,
+            NodeCommand.START,
+            NodeCommand.STOP
+    );
     
     public OperationalState(NodeState initialState) {
         this.initialState = initialState;
@@ -63,6 +75,11 @@ public class OperationalState extends NodeState{
     @Override
     public String getGreeting(NodeContext context) {
         return "Node ID is '" + context.getName() + "'! Node is ready for the commands!";
+    }
+
+    @Override
+    public Set<NodeCommand> getEnabledCommands(){
+        return enabledCommands;
     }
 
 }

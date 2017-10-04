@@ -48,7 +48,7 @@ public class DefaultCommand extends AbstractCommand {
             System.out.println("# " + AbstractCommand.START + " starts automatic tasks execution.");
             System.out.println("# " + AbstractCommand.STOP + " stops automatic tasks execution.");
         }else if(evaluate(AbstractCommand.EXIT)){
-            System.out.println("Bye Bye...!");
+            context.exit();
         }else{
             System.out.println("Unrecognized command!");
         }

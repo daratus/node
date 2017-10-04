@@ -1,6 +1,9 @@
 package com.daratus.node;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.xpath.XPath;
@@ -15,6 +18,11 @@ import com.daratus.node.domain.TaskObserver;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * 
+ * @author Zilvinas Vaira
+ *
+ */
 public class NodeContext implements TaskObserver, Runnable{
     
     private APIConnector apiConnector;
@@ -38,6 +46,8 @@ public class NodeContext implements TaskObserver, Runnable{
     private final Task nullTask = new NullTask();
     
     private Logger logger;
+    
+    private List<ContextObserver> stateObservers = new ArrayList<ContextObserver>();
     
     public NodeContext(APIConnector apiConnector, ScrapingConnector scrapingConnector, ObjectMapper mapper, W3CDom w3cDom, XPath xPath) {
         this.apiConnector = apiConnector;
@@ -73,15 +83,12 @@ public class NodeContext implements TaskObserver, Runnable{
     public XPath getxPath() {
         return xPath;
     }
-    
-    public void handleCurrentState(){
-        currentState.handle(this);
-    }
 
     public void setCurrentState(NodeState state){
         this.currentState = state;
+        notifyObservers();
     }
-    
+
     public NodeState getCurrentState() {
         return currentState;
     }
@@ -99,19 +106,6 @@ public class NodeContext implements TaskObserver, Runnable{
         return isBlocked;
     }
     
-    public void authenticate(String apiPath, String name){
-        if(!isAuthenticated()){
-            System.out.println("Sending authetication request to Daratus API for node ID '" + name + "'!");
-            String jsonResponse = apiConnector.sendRequest(apiPath + name, RequestMethod.GET);
-            if(jsonResponse != null){
-                setName(name);
-                System.out.println("Found node ID '" + name + "' on server! Succesfuly authenticated!");
-            }
-        }else{
-            logger.warning("User is already authenticated! Please use '" + AbstractCommand.LOGOUT + "' first!");
-        }
-    }
-    
     public void setName(String name) {
         if(this.name == null){
             this.name = name;
@@ -126,6 +120,49 @@ public class NodeContext implements TaskObserver, Runnable{
         return name != null;
     }
     
+    public void setCurrentTask(Task currentTask) {
+        if(currentTask != null){
+            this.currentTask = currentTask;
+        }else{
+            this.currentTask = nullTask;
+        }
+    }
+
+    public void handleCurrentState(){
+        currentState.handle(this);
+    }
+    
+    /**
+     * 
+     * @see NodeCommand.EXIT
+     */
+    public void exit(){
+        System.out.println("Bye Bye...!");
+    }
+    
+    /**
+     * 
+     * @param apiPath
+     * @param name
+     * @see NodeCommand.LOGIN
+     */
+    public void authenticate(String apiPath, String name){
+        if(!isAuthenticated()){
+            System.out.println("Sending authetication request to Daratus API for node ID '" + name + "'!");
+            String jsonResponse = apiConnector.sendRequest(apiPath + name, RequestMethod.GET);
+            if(jsonResponse != null){
+                setName(name);
+                System.out.println("Found node ID '" + name + "' on server! Succesfuly authenticated!");
+            }
+        }else{
+            logger.warning("User is already authenticated! Please use '" + AbstractCommand.LOGOUT + "' first!");
+        }
+    }
+    
+    /**
+     * 
+     * @see NodeCommand.LOGOUT
+     */
     public void logout(){
         if(isAuthenticated()){
             System.out.println("Succesfully loged out node ID '" + name + "'!");
@@ -135,6 +172,11 @@ public class NodeContext implements TaskObserver, Runnable{
         }
     }
     
+    /**
+     * 
+     * @param apiPath
+     * @see NodeCommand.NEXT
+     */
     protected void getNextTask(String apiPath){
         System.out.println("Sending next taks request to Daratus API for node ID '" + name + "'!");
         String jsonResponse = apiConnector.sendRequest(apiPath + getName(), RequestMethod.GET);
@@ -152,10 +194,18 @@ public class NodeContext implements TaskObserver, Runnable{
         }
     }
     
+    /**
+     * 
+     * @see NodeCommand.EXECUTE
+     */
     protected void executeCurrentTask(){
         currentTask.execute(this);
     }
     
+    /**
+     * 
+     * @see NodeCommand.LOOP
+     */
     protected void executeTaskLoop(){
         while(isBlocked()){
             System.out.println();
@@ -163,14 +213,6 @@ public class NodeContext implements TaskObserver, Runnable{
             executeCurrentTask();
         }
         System.out.println("Task loop has been stopped succesfully!");
-    }
-    
-    public void setCurrentTask(Task currentTask) {
-        if(currentTask != null){
-            this.currentTask = currentTask;
-        }else{
-            this.currentTask = nullTask;
-        }
     }
     
     private void sendResponse(Task task){
@@ -182,6 +224,17 @@ public class NodeContext implements TaskObserver, Runnable{
             System.out.println("Result has been sent!");
         } catch (JsonProcessingException e) {
             e.printStackTrace();
+        }
+    }
+    
+    public void addContextObserver(ContextObserver stateObserver){
+        stateObservers.add(stateObserver);
+    }
+    
+    protected void notifyObservers(){
+        Iterator<ContextObserver> iterator = stateObservers.iterator();
+        while (iterator.hasNext()) {
+            iterator.next().notify(this);
         }
     }
     

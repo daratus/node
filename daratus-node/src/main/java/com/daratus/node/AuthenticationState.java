@@ -1,5 +1,7 @@
 package com.daratus.node;
 
+import java.util.EnumSet;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -8,6 +10,14 @@ import java.util.logging.Logger;
  *
  */
 public class AuthenticationState extends NodeState{
+
+    private Set<NodeCommand> enabledCommands = EnumSet.of( 
+            NodeCommand.EXIT, 
+            NodeCommand.HELP, 
+            NodeCommand.HOST, 
+            NodeCommand.LOGIN,
+            NodeCommand.REGISTER
+    );
 
     @Override
     public void getNextTask(String apiPath, NodeContext context) {
@@ -36,6 +46,11 @@ public class AuthenticationState extends NodeState{
     @Override
     public String getGreeting(NodeContext context) {
         return "No user is currently authenticated!";
+    }
+    
+    @Override
+    public Set<NodeCommand> getEnabledCommands(){
+        return enabledCommands;
     }
 
 }
