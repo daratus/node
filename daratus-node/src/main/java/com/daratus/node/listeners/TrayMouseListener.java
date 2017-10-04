@@ -3,12 +3,21 @@ package com.daratus.node.listeners;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class TrayMouseListener extends MouseAdapter{
+import com.daratus.node.windows.NodeWindow;
 
-	@Override
-	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+public class TrayMouseListener extends MouseAdapter {
+
+    private NodeWindow window;
+    
+    public TrayMouseListener(NodeWindow window) {
+        this.window = window;
+    }
+    
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if(e.getButton() == MouseEvent.BUTTON1){
+            window.setVisible(true);
+        }
+    }
 
 }

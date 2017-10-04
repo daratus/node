@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.xml.xpath.XPath;
@@ -49,6 +50,8 @@ public class NodeContext implements TaskObserver, Runnable{
     
     private List<ContextObserver> stateObservers = new ArrayList<ContextObserver>();
     
+    private Properties properties = new Properties();
+    
     public NodeContext(APIConnector apiConnector, ScrapingConnector scrapingConnector, ObjectMapper mapper, W3CDom w3cDom, XPath xPath) {
         this.apiConnector = apiConnector;
         this.scrapingConnector = scrapingConnector;
@@ -58,10 +61,19 @@ public class NodeContext implements TaskObserver, Runnable{
         nullTask.addTaskObserver(this);
         setCurrentTask(nullTask);
         logger = getLogger(this.getClass().getSimpleName());
+        try {
+            properties.load(this.getClass().getClassLoader().getResourceAsStream("application.properties"));
+        } catch (IOException e) {
+            logger.warning("Could not load properties!");
+        }
     }
     
     public Logger getLogger(String className){
         return Logger.getLogger(className);
+    }
+    
+    public Properties getProperties(){
+        return properties;
     }
 
     public APIConnector getAPIConnector() {

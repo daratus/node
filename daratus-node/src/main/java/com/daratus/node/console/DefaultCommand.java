@@ -1,5 +1,7 @@
 package com.daratus.node.console;
 
+import java.util.Properties;
+
 import org.apache.http.HttpHost;
 
 import com.daratus.node.APIConnector;
@@ -28,7 +30,11 @@ public class DefaultCommand extends AbstractCommand {
             NodeState currentState = context.getCurrentState();
             APIConnector apiConnector = context.getAPIConnector();
             HttpHost host = apiConnector.getHost();
-            System.out.println("### Daratus Node v0.0.2 ###");
+            Properties properties = context.getProperties();
+            String version = properties.getProperty("version");
+            String title = properties.getProperty("title");
+
+            System.out.println("### " + title + " v" + version + " ###");
             System.out.println("# Current node state: " + currentState.getGreeting(context));
             System.out.println("# Current host details: " + host.toURI());
             System.out.println("#");

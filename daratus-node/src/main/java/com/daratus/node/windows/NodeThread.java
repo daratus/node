@@ -1,6 +1,6 @@
 package com.daratus.node.windows;
 
-import java.awt.Color;
+import java.util.Properties;
 
 import javax.swing.JFrame;
 import javax.xml.xpath.XPath;
@@ -36,17 +36,21 @@ public class NodeThread implements Runnable {
         initialState.setNextState(logedinState);
         NodeState runningState = new BlockedState(initialState, logedinState);
         logedinState.setNextState(runningState);
-
+        
         NodeContext context = new NodeContext(apiConnector, scrappingConnector, mapper, w3cDom, xPath);
-        NodeWindow window = new NodeWindow("Daratus Node v0.0.2", context);
+        Properties properties = context.getProperties();
+        String version = properties.getProperty("version");
+        String title = properties.getProperty("title");
 
+        NodeWindow window = new NodeWindow(title + " v" + version, context);
+        
         context.setCurrentState(initialState);
 
-        //JFrame window = new JFrame("Daratus Node v0.0.2");
-        
-        window.setLocationRelativeTo(null);
         window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        window.getContentPane().setBackground(Color.WHITE);
+        window.pack();
+        window.setLocationRelativeTo(null);
+        window.setMinimumSize(window.getPreferredSize());
+        window.setVisible(true);
 
     }
 

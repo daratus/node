@@ -17,7 +17,7 @@ public class ApplicationExitListener extends WindowAdapter implements ActionList
 	
 	@Override
 	public void windowClosing(WindowEvent e) {
-		window.exit();
+		window.setVisible(false);
 	}
 
 	@Override
