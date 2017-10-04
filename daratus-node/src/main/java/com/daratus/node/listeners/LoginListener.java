@@ -30,7 +30,6 @@ public class LoginListener implements ActionListener {
         if(!nodeId.isEmpty()){
             context.authenticate(apiPath, nodeId);
         }
-        context.handleCurrentState();
     }
 
 }

@@ -93,6 +93,12 @@ public class NodeContext implements TaskObserver, Runnable{
         return currentState;
     }
     
+    /**
+     * 
+     * @param isBlocked
+     * @see NodeCommand.START
+     * @see NodeCommand.STOP
+     */
     public void setBlocked(boolean isBlocked){
         if(!this.isBlocked && !isBlocked){
             logger.warning("Can not execute stop command. It is already stoped!");
@@ -100,6 +106,7 @@ public class NodeContext implements TaskObserver, Runnable{
             System.out.println("Stop request queued... please wait!");
         }
         this.isBlocked = isBlocked;
+        currentState.handle(this);
     }
     
     public boolean isBlocked(){
@@ -128,16 +135,18 @@ public class NodeContext implements TaskObserver, Runnable{
         }
     }
 
-    public void handleCurrentState(){
-        currentState.handle(this);
-    }
-    
     /**
      * 
      * @see NodeCommand.EXIT
      */
     public void exit(){
         System.out.println("Bye Bye...!");
+        if(isBlocked){
+            setBlocked(false);
+        }
+        if(isAuthenticated()){
+            logout();
+        }
     }
     
     /**
@@ -157,6 +166,7 @@ public class NodeContext implements TaskObserver, Runnable{
         }else{
             logger.warning("User is already authenticated! Please use '" + AbstractCommand.LOGOUT + "' first!");
         }
+        currentState.handle(this);
     }
     
     /**
@@ -170,6 +180,7 @@ public class NodeContext implements TaskObserver, Runnable{
         }else{
             logger.warning("Could not logout! There is no node authenticated!");
         }
+        currentState.handle(this);
     }
     
     /**

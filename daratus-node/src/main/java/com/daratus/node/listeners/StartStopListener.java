@@ -20,7 +20,6 @@ public class StartStopListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent arg0) {
         context.setBlocked(isRunnig);
-        context.handleCurrentState();
     }
 
 }

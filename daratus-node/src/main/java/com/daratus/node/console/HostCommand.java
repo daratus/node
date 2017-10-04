@@ -16,11 +16,13 @@ public class HostCommand extends AbstractParametrizedCommand {
 
     private APIConnector apiConnector;
     
-    private String host;
+    private String host = "";
     
-    private int port;
+    private Integer port = null;
     
-    private String scheme;
+    private String scheme = "";
+    
+    private boolean hasRequiredParameters = false;
 
     private Logger logger;
     
@@ -32,13 +34,11 @@ public class HostCommand extends AbstractParametrizedCommand {
 
     @Override
     protected void parseParameters(String[] commandParameters) {
-        if(commandParameters.length > 3){
+        hasRequiredParameters = commandParameters.length > 3;
+        if(hasRequiredParameters){
             host = commandParameters[1];
             port = Integer.valueOf(commandParameters[2]);
             scheme = commandParameters[3];
-            apiConnector.setHostDetails(host, port, scheme);
-            HttpHost host = apiConnector.getHost();
-            System.out.println("Host has been updated to '"+host.toURI()+"'!");
         }else{
             String commandToken = commandParameters.length > 0 ? commandParameters[0] : "unknown";
             logger.warning("One or more required parameters are missing for command '" + commandToken + "'!");
@@ -47,8 +47,11 @@ public class HostCommand extends AbstractParametrizedCommand {
 
     @Override
     public void doExecute() {
-        // TODO Auto-generated method stub
-
+        if(hasRequiredParameters){
+            apiConnector.setHostDetails(host, port, scheme);
+            HttpHost host = apiConnector.getHost();
+            System.out.println("Host has been updated to '"+host.toURI()+"'!");
+        }
     }
 
 }

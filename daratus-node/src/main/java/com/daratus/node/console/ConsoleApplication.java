@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class ConsoleApplication {
     public static void main(String[] args) {
 
-        APIHttpConnector apiConnector = new APIHttpConnector("86.100.97.40", 8080, "http");
+        APIHttpConnector apiConnector = new APIHttpConnector("mvp.daratus.com", 8080, "http");
         ScrapingHttpConnector scrappingConnector = new ScrapingHttpConnector();
         ObjectMapper mapper = new ObjectMapper();
 
@@ -48,7 +48,6 @@ public class ConsoleApplication {
         while (!command.evaluate(AbstractCommand.EXIT)) {
             command = factory.createCommand(scanner.nextLine());
             command.execute();
-            context.handleCurrentState();
         }
         scanner.close();
 

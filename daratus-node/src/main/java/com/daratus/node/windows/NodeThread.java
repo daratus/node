@@ -22,7 +22,7 @@ public class NodeThread implements Runnable {
     @Override
     public void run() {
 
-        APIHttpConnector apiConnector = new APIHttpConnector("86.100.97.40", 8080, "http");
+        APIHttpConnector apiConnector = new APIHttpConnector("mvp.daratus.com", 8080, "http");
         ScrapingHttpConnector scrappingConnector = new ScrapingHttpConnector();
         ObjectMapper mapper = new ObjectMapper();
 
