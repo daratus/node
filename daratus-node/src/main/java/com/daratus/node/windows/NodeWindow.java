@@ -60,8 +60,10 @@ public class NodeWindow extends JFrame implements ContextObserver{
     private TrayIcon trayIcon;
 
     private SystemTray systemTray;
-
+    
     private Map<NodeCommand, MenuItem> menus = new EnumMap<NodeCommand, MenuItem>(NodeCommand.class);
+    
+    private Map<NodeCommand, JButton> buttons = new EnumMap<NodeCommand, JButton>(NodeCommand.class);
 
     /**
      * Initiates main states, controls and listeners
@@ -73,9 +75,7 @@ public class NodeWindow extends JFrame implements ContextObserver{
         this.context = context;
         context.addContextObserver(this);
 
-        ApplicationExitListener exitListener = new ApplicationExitListener(this);
-        this.addWindowListener(exitListener);
-
+        // WELCOME WINDOW
         Container contentPane = getContentPane();
         JLabel welcomeLabel = new JLabel("<html><h1>Welcome to Daratus</h1></html>");
         welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -90,10 +90,25 @@ public class NodeWindow extends JFrame implements ContextObserver{
             noticeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             centerBox.add(noticeLabel);
             centerBox.add(Box.createVerticalStrut(30));
+
+            LoginListener loginListener = new LoginListener(APICommand.NODE_PATH, context);
+            LogoutListener logoutListener = new LogoutListener(context);
+            StartStopListener startListener = new StartStopListener(context, true);
+            StartStopListener stopListener = new StartStopListener(context, false);
             
-            JButton currentButton = new JButton("Start");
-            currentButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-            centerBox.add(currentButton);
+            Box mainButtonBox = Box.createHorizontalBox();
+            mainButtonBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+                mainButtonBox.add(addWelcomeWindowButton(NodeCommand.REGISTER, new JButton("Register"), loginListener));
+                mainButtonBox.add(addWelcomeWindowButton(NodeCommand.LOGIN, new JButton("Login"), loginListener));
+                mainButtonBox.add(addWelcomeWindowButton(NodeCommand.LOGOUT, new JButton("Logout"), logoutListener));
+            centerBox.add(mainButtonBox);    
+            centerBox.add(Box.createVerticalStrut(30));
+
+            Box nodeButtonBox = Box.createHorizontalBox();
+            nodeButtonBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+                nodeButtonBox.add(addWelcomeWindowButton(NodeCommand.START, new JButton("Start"), startListener));
+                nodeButtonBox.add(addWelcomeWindowButton(NodeCommand.STOP, new JButton("Stop"), stopListener));
+            centerBox.add(nodeButtonBox);    
             centerBox.add(Box.createVerticalStrut(30));
             
         contentPane.add(centerBox);
@@ -108,7 +123,13 @@ public class NodeWindow extends JFrame implements ContextObserver{
             southPanel.add(networkLink);
         contentPane.add(southPanel, BorderLayout.SOUTH);
         
-        if (SystemTray.isSupported()) {
+
+        boolean isSystemTraySupported = SystemTray.isSupported();
+        ApplicationExitListener exitListener = new ApplicationExitListener(this, isSystemTraySupported);
+        this.addWindowListener(exitListener);
+
+        // SYSTEM TRAY MENU
+        if (isSystemTraySupported) {
             Image iconImage;
             try {
                 iconImage = createImage("logo.png", "tray icon");
@@ -117,13 +138,14 @@ public class NodeWindow extends JFrame implements ContextObserver{
                 popupMenu = new PopupMenu();
 
                 // MENU
-                addTrayMenuItem(NodeCommand.LOGIN, "Login", new LoginListener(APICommand.NODE_PATH, context));
-                addTrayMenuItem(NodeCommand.LOGOUT, "Logout", new LogoutListener(context));
+                addTrayMenuItem(NodeCommand.REGISTER, "Register",  loginListener);
+                addTrayMenuItem(NodeCommand.LOGIN, "Login",  loginListener);
+                addTrayMenuItem(NodeCommand.LOGOUT, "Logout", logoutListener);
                 addTrayMenuItem("Node Info");
                 popupMenu.addSeparator();
 
-                addTrayMenuItem(NodeCommand.START, "Start", new StartStopListener(context, true));
-                addTrayMenuItem(NodeCommand.STOP, "Stop", new StartStopListener(context, false));
+                addTrayMenuItem(NodeCommand.START, "Start", startListener);
+                addTrayMenuItem(NodeCommand.STOP, "Stop", stopListener);
                 popupMenu.addSeparator();
 
                 MenuItem exitItem = addTrayMenuItem("Exit");
@@ -142,10 +164,15 @@ public class NodeWindow extends JFrame implements ContextObserver{
             }
         } else {
             System.out.println("SystemTray is not supported!");
-
         }
     }
-
+    
+    private JButton addWelcomeWindowButton(NodeCommand menuSlot, JButton button, ActionListener listener){
+        button.addActionListener(listener);
+        buttons.put(menuSlot, button);
+        return button;
+    }
+    
     /**
      * Add tray menu item and store it on a particular menu slot (disabled by
      * default)
@@ -172,16 +199,6 @@ public class NodeWindow extends JFrame implements ContextObserver{
      */
     private MenuItem addTrayMenuItem(String title) {
         return popupMenu.add(new MenuItem(title));
-    }
-
-    /**
-     * Retrieves a particular menu based on a provided slot constant
-     * 
-     * @param menuSlot
-     * @return
-     */
-    public MenuItem getTrayMenuItem(int menuSlot) {
-        return menus.get(menuSlot);
     }
 
     /**
@@ -235,13 +252,23 @@ public class NodeWindow extends JFrame implements ContextObserver{
     public void notify(NodeContext context) {
         NodeState currentState = context.getCurrentState();
         Set<NodeCommand> enabledCommands = currentState.getEnabledCommands();
-        Set<Entry<NodeCommand, MenuItem>> entrySet = menus.entrySet();
-        Iterator<Entry<NodeCommand, MenuItem>> iterator =  entrySet.iterator();
-        while (iterator.hasNext()) {
-            Entry<NodeCommand, MenuItem> entry = iterator.next();
+        
+        Set<Entry<NodeCommand, MenuItem>> menuEntrySet = menus.entrySet();
+        Iterator<Entry<NodeCommand, MenuItem>> menuIterator =  menuEntrySet.iterator();
+        while (menuIterator.hasNext()) {
+            Entry<NodeCommand, MenuItem> entry = menuIterator.next();
             NodeCommand nodeCommand = entry.getKey();
             MenuItem menuItem = entry.getValue();
             menuItem.setEnabled(enabledCommands.contains(nodeCommand));
+        }
+        
+        Set<Entry<NodeCommand, JButton>> buttonsEntrySet = buttons.entrySet();
+        Iterator<Entry<NodeCommand, JButton>> buttonsIterator =  buttonsEntrySet.iterator();
+        while (buttonsIterator.hasNext()) {
+            Entry<NodeCommand, JButton> entry = buttonsIterator.next();
+            NodeCommand nodeCommand = entry.getKey();
+            JButton button = entry.getValue();
+            button.setEnabled(enabledCommands.contains(nodeCommand));
         }
     }
 

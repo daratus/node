@@ -21,8 +21,7 @@ public class OperationalState extends NodeState{
             NodeCommand.LOGOUT,
             NodeCommand.NEXT,
             NodeCommand.EXECUTE,
-            NodeCommand.START,
-            NodeCommand.STOP
+            NodeCommand.START
     );
     
     public OperationalState(NodeState initialState) {

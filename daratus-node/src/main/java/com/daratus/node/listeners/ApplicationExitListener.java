@@ -7,22 +7,34 @@ import java.awt.event.WindowEvent;
 
 import com.daratus.node.windows.NodeWindow;
 
+/**
+ * 
+ * @author Zilvinas Vaira
+ *
+ */
 public class ApplicationExitListener extends WindowAdapter implements ActionListener {
 
-	private NodeWindow window;
-	
-	public ApplicationExitListener(NodeWindow window) {
-		this.window = window;
-	}
-	
-	@Override
-	public void windowClosing(WindowEvent e) {
-		window.setVisible(false);
-	}
+    private NodeWindow window;
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		window.exit();
-	}
-	
+    private boolean isSystemTraySupported;
+
+    public ApplicationExitListener(NodeWindow window, boolean isSystemTraySupported) {
+        this.window = window;
+        this.isSystemTraySupported = isSystemTraySupported;
+    }
+
+    @Override
+    public void windowClosing(WindowEvent e) {
+        if(isSystemTraySupported){
+            window.setVisible(false);
+        }else{
+            window.exit();
+        }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        window.exit();
+    }
+
 }
