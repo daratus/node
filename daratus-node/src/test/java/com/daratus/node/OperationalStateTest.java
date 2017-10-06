@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.daratus.node.console.ConsoleMenssenger;
 import com.daratus.node.domain.NullTask;
 
 /**
@@ -29,6 +30,7 @@ public class OperationalStateTest {
     public void setUp() throws Exception {
         initialState = new AuthenticationState();
         context = new NodeContextMockup();
+        context.setMessenger(new ConsoleMenssenger(System.out, System.out));
         operationalState = new OperationalState(initialState);
     }
     
@@ -73,7 +75,6 @@ public class OperationalStateTest {
         context.setName(originalName);
         context.setCurrentState(operationalState);
         context.setBlocked(true);
-        operationalState.handle(context);
         assertNotNull(context.getCurrentState());
         assertEquals(operationalState, context.getCurrentState());
     }
@@ -88,7 +89,6 @@ public class OperationalStateTest {
         context.setName(originalName);
         context.setCurrentState(operationalState);
         context.setBlocked(true);
-        operationalState.handle(context);
         assertNotNull(context.getCurrentState());
         assertEquals(blockedState, context.getCurrentState());
         

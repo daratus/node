@@ -11,6 +11,7 @@ public class ConsoleMenssenger implements NodeMessenger {
     
     public ConsoleMenssenger(PrintStream out, PrintStream err) {
        this.out = out;
+       this.err = err;
     }
 
     @Override

@@ -9,6 +9,8 @@ import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.daratus.node.console.ConsoleMenssenger;
+
 /**
  * 
  * 
@@ -26,6 +28,7 @@ public class AuthenticationStateTest {
     @Before
     public void setUp() throws Exception {
         context = new NodeContextMockup();
+        context.setMessenger(new ConsoleMenssenger(System.out, System.out));
         initialState = new AuthenticationState();
     }
     
@@ -81,7 +84,6 @@ public class AuthenticationStateTest {
     public void testHandleFailedOperational(){
         context.setCurrentState(initialState);
         context.setBlocked(true);
-        initialState.handle(context);
         assertFalse(context.isBlocked());
     }
 
