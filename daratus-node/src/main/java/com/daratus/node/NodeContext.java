@@ -45,6 +45,8 @@ public class NodeContext implements TaskObserver, Runnable{
     private Task currentTask;
 
     private final Task nullTask = new NullTask();
+
+    private NodeMessenger messenger = null;
     
     private Logger logger;
     
@@ -72,6 +74,14 @@ public class NodeContext implements TaskObserver, Runnable{
         return Logger.getLogger(className);
     }
     
+    public NodeMessenger getMessenger() {
+        return messenger;
+    }
+
+    public void setMessenger(NodeMessenger messenger) {
+        this.messenger = messenger;
+    }
+
     public Properties getProperties(){
         return properties;
     }
@@ -115,7 +125,7 @@ public class NodeContext implements TaskObserver, Runnable{
         if(!this.isBlocked && !isBlocked){
             logger.warning("Can not execute stop command. It is already stoped!");
         }else if(!isBlocked){
-            System.out.println("Stop request queued... please wait!");
+            messenger.warning("Stop request queued... please wait!");
         }
         this.isBlocked = isBlocked;
         currentState.handle(this);
@@ -152,7 +162,7 @@ public class NodeContext implements TaskObserver, Runnable{
      * @see NodeCommand.EXIT
      */
     public void exit(){
-        System.out.println("Bye Bye...!");
+        messenger.info("Bye Bye...!");
         if(isBlocked){
             setBlocked(false);
         }
@@ -169,14 +179,14 @@ public class NodeContext implements TaskObserver, Runnable{
      */
     public void authenticate(String apiPath, String name){
         if(!isAuthenticated()){
-            System.out.println("Sending authetication request to Daratus API for node ID '" + name + "'!");
+            messenger.info("Sending authetication request to Daratus API for node ID '" + name + "'!");
             String jsonResponse = apiConnector.sendRequest(apiPath + name, RequestMethod.GET);
             if(jsonResponse != null){
                 setName(name);
-                System.out.println("Found node ID '" + name + "' on server! Succesfuly authenticated!");
+                messenger.info("Found node ID '" + name + "' on server! Succesfuly authenticated!");
             }
         }else{
-            logger.warning("User is already authenticated! Please use '" + AbstractCommand.LOGOUT + "' first!");
+            messenger.error("User is already authenticated! Please use '" + AbstractCommand.LOGOUT + "' first!");
         }
         currentState.handle(this);
     }
@@ -187,10 +197,10 @@ public class NodeContext implements TaskObserver, Runnable{
      */
     public void logout(){
         if(isAuthenticated()){
-            System.out.println("Succesfully loged out node ID '" + name + "'!");
+            messenger.info("Succesfully loged out node ID '" + name + "'!");
             this.name = null;
         }else{
-            logger.warning("Could not logout! There is no node authenticated!");
+            messenger.warning("Could not logout! There is no node authenticated!");
         }
         currentState.handle(this);
     }
@@ -201,13 +211,13 @@ public class NodeContext implements TaskObserver, Runnable{
      * @see NodeCommand.NEXT
      */
     protected void getNextTask(String apiPath){
-        System.out.println("Sending next taks request to Daratus API for node ID '" + name + "'!");
+        messenger.info("Sending next task request to Daratus API for node ID '" + name + "'!");
         String jsonResponse = apiConnector.sendRequest(apiPath + getName(), RequestMethod.GET);
         if(jsonResponse != null){
             try {
                 Task task = mapper.readValue(jsonResponse, Task.class);
                 task.addTaskObserver(this);
-                System.out.println("Got a task '" + task.getClass().getSimpleName() + "' with target URL '" + task + "' from server!");
+                messenger.info("Got a task '" + task.getClass().getSimpleName() + "' with target URL '" + task + "' from server!");
                 setCurrentTask(task);
             } catch (IOException e) {
                 logger.warning("Could not read task from server!");
@@ -235,7 +245,7 @@ public class NodeContext implements TaskObserver, Runnable{
             System.out.println("...looping...");
             executeCurrentTask();
         }
-        System.out.println("Task loop has been stopped succesfully!");
+        messenger.info("Task loop has been stopped succesfully!");
     }
     
     private void sendResponse(Task task){

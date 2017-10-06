@@ -67,6 +67,7 @@ public class OperationalState extends NodeState{
             }else{
                 Logger logger = context.getLogger(this.getClass().getSimpleName());
                 logger.warning("Previous automatic execution is not yet stopped! Please wait while it ends. Aborting ...");
+                context.setBlocked(false);
             }
         }
     }

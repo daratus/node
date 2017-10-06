@@ -13,9 +13,9 @@ import com.daratus.node.console.AbstractCommand;
  */
 public class BlockedState extends NodeState{
 
-    private NodeState initialState;
+    private NodeState authenticationState;
 
-    private NodeState logedinState;
+    private NodeState operationalState;
     
     private Set<NodeCommand> enabledCommands = EnumSet.of( 
             NodeCommand.EXIT, 
@@ -23,9 +23,9 @@ public class BlockedState extends NodeState{
             NodeCommand.STOP
     );
     
-    public BlockedState(NodeState initialState, NodeState logedinState) {
-        this.initialState = initialState;
-        this.logedinState = logedinState;
+    public BlockedState(NodeState authenticationState, NodeState operationalState) {
+        this.authenticationState = authenticationState;
+        this.operationalState = operationalState;
 
     }
     
@@ -44,10 +44,10 @@ public class BlockedState extends NodeState{
     @Override
     public void handle(NodeContext context) {
         if(!context.isAuthenticated()){
-            context.setCurrentState(initialState);
+            context.setCurrentState(authenticationState);
             context.setBlocked(false);
         }else if(!context.isBlocked()){
-            context.setCurrentState(logedinState);
+            context.setCurrentState(operationalState);
         }
     }
 

@@ -27,7 +27,7 @@ public class LoginListener implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         String nodeId = JOptionPane.showInputDialog("Please enter Node ID!");
         
-        if(!nodeId.isEmpty()){
+        if(nodeId !=null && !nodeId.isEmpty()){
             context.authenticate(apiPath, nodeId);
         }
     }

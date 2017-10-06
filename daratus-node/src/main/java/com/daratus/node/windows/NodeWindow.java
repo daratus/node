@@ -4,25 +4,26 @@ import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.EnumMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Vector;
 
 import javax.imageio.ImageIO;
 import javax.swing.Box;
@@ -73,6 +74,8 @@ public class NodeWindow extends JFrame implements ContextObserver{
 
     private JLabel hostDetailsLabel = new JLabel("n/a");
     
+    private JLabel messageLabel = new JLabel(" ");
+    
     /**
      * Initiates main states, controls and listeners
      * 
@@ -81,10 +84,25 @@ public class NodeWindow extends JFrame implements ContextObserver{
     public NodeWindow(String title, NodeContext context) {
         super(title);
         this.context = context;
+        context.setMessenger(new WindowsMessenger(this));
         context.addContextObserver(this);
         
         // WELCOME WINDOW
         Container contentPane = getContentPane();
+        Image trayIconImage = null;
+        try {
+            List<Image> windowIconImages = new Vector<Image>();
+            trayIconImage = createImage("logo16x16.png", "tray icon");
+            windowIconImages.add(trayIconImage);
+            windowIconImages.add(createImage("logo32x32.png", "tray icon"));
+            windowIconImages.add(createImage("logo40x40.png", "tray icon"));
+            windowIconImages.add(createImage("logo64x64.png", "tray icon"));
+            windowIconImages.add(createImage("logo128x128.png", "tray icon"));
+            this.setIconImages(windowIconImages);
+        } catch (IOException e2) {
+            System.out.println("Could not load application icons!");
+        }
+        
         
         // North panel
         JLabel welcomeLabel = new JLabel("<html><h1>Welcome to Daratus</h1></html>");
@@ -96,13 +114,19 @@ public class NodeWindow extends JFrame implements ContextObserver{
             centerBox.add(Box.createHorizontalStrut(500));
 
             centerBox.add(Box.createVerticalStrut(20));
+            Dimension statusItemSize = new Dimension(400, 50); 
             Box statusBox = Box.createHorizontalBox();
+            //statusBox.setBorder(BorderFactory.createLineBorder(Color.RED));
+            statusBox.setSize(statusItemSize);
+            statusBox.setMaximumSize(statusItemSize);
             statusBox.setAlignmentX(Component.CENTER_ALIGNMENT);
                 
                 Box statusTitlesBox = Box.createVerticalBox();
+                //statusTitlesBox.setBorder(BorderFactory.createLineBorder(Color.GREEN));
                 statusBox.add(statusTitlesBox);
                 
                 Box statusValuesBox = Box.createVerticalBox();
+                //statusValuesBox.setBorder(BorderFactory.createLineBorder(Color.YELLOW));
                 statusBox.add(statusValuesBox);
                 
                 JLabel nodeStateTitle = new JLabel("Node status: ");
@@ -150,6 +174,10 @@ public class NodeWindow extends JFrame implements ContextObserver{
             centerBox.add(nodeButtonBox);    
             centerBox.add(Box.createVerticalStrut(30));
             
+            messageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            centerBox.add(messageLabel);
+            centerBox.add(Box.createVerticalStrut(30));
+            
         contentPane.add(centerBox);
 
         // Links
@@ -170,43 +198,48 @@ public class NodeWindow extends JFrame implements ContextObserver{
 
         // SYSTEM TRAY MENU
         if (isSystemTraySupported) {
-            Image iconImage;
+
+            trayIcon = new TrayIcon(trayIconImage);
+            systemTray = SystemTray.getSystemTray();
+            popupMenu = new PopupMenu();
+
+            // MENU
+            addTrayMenuItem(NodeCommand.REGISTER, "Register", loginListener);
+            addTrayMenuItem(NodeCommand.LOGIN, "Login", loginListener);
+            addTrayMenuItem(NodeCommand.LOGOUT, "Logout", logoutListener);
+            addTrayMenuItem("Node Info");
+            popupMenu.addSeparator();
+
+            addTrayMenuItem(NodeCommand.START, "Start", startListener);
+            addTrayMenuItem(NodeCommand.STOP, "Stop", stopListener);
+            popupMenu.addSeparator();
+
+            MenuItem exitItem = addTrayMenuItem("Exit");
+            exitItem.addActionListener(exitListener);
+
+            trayIcon.setPopupMenu(popupMenu);
+            trayIcon.addMouseListener(new TrayMouseListener(this));
             try {
-                iconImage = createImage("logo.png", "tray icon");
-                trayIcon = new TrayIcon(iconImage);
-                systemTray = SystemTray.getSystemTray();
-                popupMenu = new PopupMenu();
-
-                // MENU
-                addTrayMenuItem(NodeCommand.REGISTER, "Register",  loginListener);
-                addTrayMenuItem(NodeCommand.LOGIN, "Login",  loginListener);
-                addTrayMenuItem(NodeCommand.LOGOUT, "Logout", logoutListener);
-                addTrayMenuItem("Node Info");
-                popupMenu.addSeparator();
-
-                addTrayMenuItem(NodeCommand.START, "Start", startListener);
-                addTrayMenuItem(NodeCommand.STOP, "Stop", stopListener);
-                popupMenu.addSeparator();
-
-                MenuItem exitItem = addTrayMenuItem("Exit");
-                exitItem.addActionListener(exitListener);
-
-                trayIcon.setPopupMenu(popupMenu);
-                trayIcon.addMouseListener(new TrayMouseListener(this));
-                try {
-                    systemTray.add(trayIcon);
-                } catch (AWTException e) {
-                    System.out.println("TrayIcon could not be added!");
-                }
-
-            } catch (IOException e1) {
-                System.out.println("TrayIcon image could not loaded!");
+                systemTray.add(trayIcon);
+            } catch (AWTException e) {
+                System.out.println("TrayIcon could not be added!");
             }
+
         } else {
             System.out.println("SystemTray is not supported!");
         }
     }
     
+    
+    
+    public TrayIcon getTrayIcon() {
+        return trayIcon;
+    }
+
+    public JLabel getMessageLabel() {
+        return messageLabel;
+    }
+
     private JButton addWelcomeWindowButton(NodeCommand menuSlot, JButton button, ActionListener listener){
         button.addActionListener(listener);
         buttons.put(menuSlot, button);
@@ -268,12 +301,12 @@ public class NodeWindow extends JFrame implements ContextObserver{
         
         if(imageIcon != null){
             image = imageIcon.getImage();
-            if (image.getHeight(null) > 16) {
+            /*if (image.getHeight(null) > 16) {
                 BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
                 Graphics g = bufferedImage.createGraphics();
                 g.drawImage(image, 0, 0, 16, 16, null);
                 image = bufferedImage;
-            }
+            }*/
         }
         
         return image;
@@ -296,8 +329,8 @@ public class NodeWindow extends JFrame implements ContextObserver{
 
         Set<NodeCommand> enabledCommands = currentState.getEnabledCommands();
         
-        nodeStateLabel.setText(currentState.getGreeting(context));
-        hostDetailsLabel.setText(host.toURI());
+        nodeStateLabel.setText("<html><p>" + currentState.getGreeting(context) + "</p></html>");
+        hostDetailsLabel.setText("<html><p>" + host.toURI() + "</p></html>");
         
         Set<Entry<NodeCommand, MenuItem>> menuEntrySet = menus.entrySet();
         Iterator<Entry<NodeCommand, MenuItem>> menuIterator =  menuEntrySet.iterator();

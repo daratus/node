@@ -6,6 +6,7 @@ import org.apache.http.HttpHost;
 
 import com.daratus.node.APIConnector;
 import com.daratus.node.NodeContext;
+import com.daratus.node.NodeMessenger;
 
 /**
  * 
@@ -26,10 +27,13 @@ public class HostCommand extends AbstractParametrizedCommand {
 
     private Logger logger;
     
+    private NodeMessenger messenger;
+    
     public HostCommand(String[] commandParameters, NodeContext context) {
         super(commandParameters);
         apiConnector = context.getAPIConnector();
         logger = context.getLogger(this.getClass().getSimpleName());
+        context.getMessenger();
     }
 
     @Override
@@ -50,7 +54,7 @@ public class HostCommand extends AbstractParametrizedCommand {
         if(hasRequiredParameters){
             apiConnector.setHostDetails(host, port, scheme);
             HttpHost host = apiConnector.getHost();
-            System.out.println("Host has been updated to '"+host.toURI()+"'!");
+            messenger.info("Host has been updated to '"+host.toURI()+"'!");
         }
     }
 

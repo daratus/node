@@ -6,6 +6,7 @@ import org.apache.http.HttpHost;
 
 import com.daratus.node.APIConnector;
 import com.daratus.node.NodeContext;
+import com.daratus.node.NodeMessenger;
 import com.daratus.node.NodeState;
 
 public class DefaultCommand extends AbstractCommand {
@@ -26,6 +27,7 @@ public class DefaultCommand extends AbstractCommand {
     }
 
     public void execute() {
+        NodeMessenger messenger = context.getMessenger();
         if(evaluate(AbstractCommand.HELP)){
             NodeState currentState = context.getCurrentState();
             APIConnector apiConnector = context.getAPIConnector();
@@ -34,29 +36,29 @@ public class DefaultCommand extends AbstractCommand {
             String version = properties.getProperty("version");
             String title = properties.getProperty("title");
 
-            System.out.println("### " + title + " v" + version + " ###");
-            System.out.println("# Current node state: " + currentState.getGreeting(context));
-            System.out.println("# Current host details: " + host.toURI());
-            System.out.println("#");
-            System.out.println("# Available commands:");
-            System.out.println("# " + AbstractCommand.REGISTER + " <name> - registers new node, name must be unique.");
-            System.out.println("# " + AbstractCommand.LOGIN + " <id> - logins with existing node.");
-            System.out.println("# " + AbstractCommand.LOGOUT + " - logouts current node.");
-            System.out.println("# " + AbstractCommand.HOST + " <host> <port> <scheme> - updates Daratus API host details.");
-            System.out.println("# " + AbstractCommand.HELP + " - prints title and available commands.");
-            System.out.println("# " + AbstractCommand.EXIT + " - quits the program.");
-            System.out.println("#");
-            System.out.println("# Manual execution commands:");
-            System.out.println("# " + AbstractCommand.NEXT + " - receives a task from the server.");
-            System.out.println("# " + AbstractCommand.EXECUTE + " - executes a task if there is one.");
-            System.out.println("#");
-            System.out.println("# Automatic execution commands:");
-            System.out.println("# " + AbstractCommand.START + " starts automatic tasks execution.");
-            System.out.println("# " + AbstractCommand.STOP + " stops automatic tasks execution.");
+            messenger.info("### " + title + " v" + version + " ###");
+            messenger.info("# Current node state: " + currentState.getGreeting(context));
+            messenger.info("# Current host details: " + host.toURI());
+            messenger.info("#");
+            messenger.info("# Available commands:");
+            messenger.info("# " + AbstractCommand.REGISTER + " <name> - registers new node, name must be unique.");
+            messenger.info("# " + AbstractCommand.LOGIN + " <id> - logins with existing node.");
+            messenger.info("# " + AbstractCommand.LOGOUT + " - logouts current node.");
+            messenger.info("# " + AbstractCommand.HOST + " <host> <port> <scheme> - updates Daratus API host details.");
+            messenger.info("# " + AbstractCommand.HELP + " - prints title and available commands.");
+            messenger.info("# " + AbstractCommand.EXIT + " - quits the program.");
+            messenger.info("#");
+            messenger.info("# Manual execution commands:");
+            messenger.info("# " + AbstractCommand.NEXT + " - receives a task from the server.");
+            messenger.info("# " + AbstractCommand.EXECUTE + " - executes a task if there is one.");
+            messenger.info("#");
+            messenger.info("# Automatic execution commands:");
+            messenger.info("# " + AbstractCommand.START + " starts automatic tasks execution.");
+            messenger.info("# " + AbstractCommand.STOP + " stops automatic tasks execution.");
         }else if(evaluate(AbstractCommand.EXIT)){
             context.exit();
         }else{
-            System.out.println("Unrecognized command!");
+            messenger.warning("Unrecognized command!");
         }
     }
 

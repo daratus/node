@@ -39,6 +39,7 @@ public class ConsoleApplication {
         logedinState.setNextState(runningState);
 
         NodeContext context = new NodeContext(apiConnector, scrappingConnector, mapper, w3cDom, xPath);
+        context.setMessenger(new ConsoleMenssenger(System.out, System.err));
         context.setCurrentState(initialState);
 
         Scanner scanner = new Scanner(System.in);

@@ -3,6 +3,7 @@ package com.daratus.node.domain;
 import org.w3c.dom.Document;
 
 import com.daratus.node.NodeContext;
+import com.daratus.node.NodeMessenger;
 import com.daratus.node.ScrapingConnector;
 
 /**
@@ -24,11 +25,12 @@ public class GetData extends Task {
     @Override
     public void execute(NodeContext context){
         ScrapingConnector connector = context.getScrapingConnector();
+        NodeMessenger messenger = context.getMessenger();
 
-        System.out.println("Executing '" + this.getClass().getSimpleName() + "' command...");
+        messenger.info("Executing '" + this.getClass().getSimpleName() + "' command...");
         System.out.println("Requesting HTML data from '" + targetURL + "' website...");
         String htmlResponse = connector.scrape(targetURL);
-        System.out.println("Got response, it is " + (htmlResponse.isEmpty() ? "" : "NOT") + " empty!");
+        messenger.info("Got response, it is " + (htmlResponse.isEmpty() ? "" : "NOT") + " empty!");
         
         Document htmlDocument = parseHtmlDocument(htmlResponse, context);
         boolean hasChanges = false;
