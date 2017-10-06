@@ -5,6 +5,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.MenuItem;
@@ -32,6 +33,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import org.apache.http.HttpHost;
+
+import com.daratus.node.APIConnector;
 import com.daratus.node.ContextObserver;
 import com.daratus.node.NodeCommand;
 import com.daratus.node.NodeContext;
@@ -65,6 +69,10 @@ public class NodeWindow extends JFrame implements ContextObserver{
     
     private Map<NodeCommand, JButton> buttons = new EnumMap<NodeCommand, JButton>(NodeCommand.class);
 
+    private JLabel nodeStateLabel = new JLabel("n/a");
+
+    private JLabel hostDetailsLabel = new JLabel("n/a");
+    
     /**
      * Initiates main states, controls and listeners
      * 
@@ -74,19 +82,48 @@ public class NodeWindow extends JFrame implements ContextObserver{
         super(title);
         this.context = context;
         context.addContextObserver(this);
-
+        
         // WELCOME WINDOW
         Container contentPane = getContentPane();
+        
+        // North panel
         JLabel welcomeLabel = new JLabel("<html><h1>Welcome to Daratus</h1></html>");
         welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
         contentPane.add(welcomeLabel, BorderLayout.NORTH);
         
+        // Center panel
         Box centerBox = Box.createVerticalBox();
-        //centerBox.setBorder(BorderFactory.createLineBorder(Color.red, 1));
             centerBox.add(Box.createHorizontalStrut(500));
 
+            centerBox.add(Box.createVerticalStrut(20));
+            Box statusBox = Box.createHorizontalBox();
+            statusBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+                
+                Box statusTitlesBox = Box.createVerticalBox();
+                statusBox.add(statusTitlesBox);
+                
+                Box statusValuesBox = Box.createVerticalBox();
+                statusBox.add(statusValuesBox);
+                
+                JLabel nodeStateTitle = new JLabel("Node status: ");
+                Font defaultTitleFont = nodeStateTitle.getFont();
+                Font boldTitleFont = new Font(defaultTitleFont.getFontName(), Font.BOLD, defaultTitleFont.getSize());
+                nodeStateTitle.setFont(boldTitleFont);
+                nodeStateTitle.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                statusTitlesBox.add(nodeStateTitle);
+                statusValuesBox.add(nodeStateLabel);
+
+                JLabel hostDetailsTitle = new JLabel("API host details: ");
+                hostDetailsTitle.setFont(boldTitleFont);
+                hostDetailsTitle.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                statusTitlesBox.add(hostDetailsTitle);
+                statusValuesBox.add(hostDetailsLabel);
+                
+            centerBox.add(statusBox);
+            
+            // Notice
             centerBox.add(Box.createVerticalStrut(50));
-            JLabel noticeLabel = new JLabel("Welcome to Daratus");
+            JLabel noticeLabel = new JLabel("Some terms and conditions that user must agree should be placed here...");
             noticeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             centerBox.add(noticeLabel);
             centerBox.add(Box.createVerticalStrut(30));
@@ -96,6 +133,7 @@ public class NodeWindow extends JFrame implements ContextObserver{
             StartStopListener startListener = new StartStopListener(context, true);
             StartStopListener stopListener = new StartStopListener(context, false);
             
+            // Authentication buttons
             Box mainButtonBox = Box.createHorizontalBox();
             mainButtonBox.setAlignmentX(Component.CENTER_ALIGNMENT);
                 mainButtonBox.add(addWelcomeWindowButton(NodeCommand.REGISTER, new JButton("Register"), loginListener));
@@ -104,6 +142,7 @@ public class NodeWindow extends JFrame implements ContextObserver{
             centerBox.add(mainButtonBox);    
             centerBox.add(Box.createVerticalStrut(30));
 
+            // Node buttons
             Box nodeButtonBox = Box.createHorizontalBox();
             nodeButtonBox.setAlignmentX(Component.CENTER_ALIGNMENT);
                 nodeButtonBox.add(addWelcomeWindowButton(NodeCommand.START, new JButton("Start"), startListener));
@@ -113,6 +152,7 @@ public class NodeWindow extends JFrame implements ContextObserver{
             
         contentPane.add(centerBox);
 
+        // Links
         FlowLayout southLayout = new FlowLayout(FlowLayout.LEFT, 20, 10);
         JPanel southPanel = new JPanel(southLayout);
             JLabel daratusLink = new JLabel("<html><a href=\"www.daratus.com\">www.daratus.com</a></html>");
@@ -251,7 +291,13 @@ public class NodeWindow extends JFrame implements ContextObserver{
     @Override
     public void notify(NodeContext context) {
         NodeState currentState = context.getCurrentState();
+        APIConnector apiConnector = context.getAPIConnector();
+        HttpHost host = apiConnector.getHost();
+
         Set<NodeCommand> enabledCommands = currentState.getEnabledCommands();
+        
+        nodeStateLabel.setText(currentState.getGreeting(context));
+        hostDetailsLabel.setText(host.toURI());
         
         Set<Entry<NodeCommand, MenuItem>> menuEntrySet = menus.entrySet();
         Iterator<Entry<NodeCommand, MenuItem>> menuIterator =  menuEntrySet.iterator();
