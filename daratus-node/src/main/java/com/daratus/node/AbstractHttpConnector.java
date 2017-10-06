@@ -20,7 +20,7 @@ public abstract class AbstractHttpConnector {
     }
     
     protected String parseResponseContent(CloseableHttpResponse response) throws UnsupportedOperationException, IOException{
-        String responseToken = null;
+        String responseToken = "";
         if(response!=null && response.getStatusLine().getStatusCode() == 200){
             BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
             StringBuilder stringBuilder = new StringBuilder();
@@ -28,7 +28,7 @@ public abstract class AbstractHttpConnector {
             while( (line = reader.readLine()) != null){
                 stringBuilder.append(line);
             }
-            return stringBuilder.toString();
+            responseToken = stringBuilder.toString();
         }
         return responseToken;
     }

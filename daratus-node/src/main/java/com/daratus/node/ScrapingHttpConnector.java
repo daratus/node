@@ -12,8 +12,9 @@ public class ScrapingHttpConnector extends AbstractHttpConnector implements Scra
 
     public String scrape(String uriToken) {
         httpClient = HttpClients.createDefault();
-        String responseToken = null;
+        String responseToken = "";
         try {
+            uriToken = uriToken.startsWith("http") ? uriToken : "http://" + uriToken; 
             HttpGet getRequest = new HttpGet(new URI(uriToken));
             logger.info("Sending GET request to '" + uriToken + "'!");
             CloseableHttpResponse response = httpClient.execute(getRequest);
@@ -21,8 +22,7 @@ public class ScrapingHttpConnector extends AbstractHttpConnector implements Scra
             responseToken = parseResponseContent(response);
             httpClient.close();
         } catch (URISyntaxException | IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.warning("Could not scrape page and/or parse response for '" + uriToken + "'!");
         }
         return responseToken;
     }

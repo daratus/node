@@ -33,7 +33,7 @@ public class HostCommand extends AbstractParametrizedCommand {
         super(commandParameters);
         apiConnector = context.getAPIConnector();
         logger = context.getLogger(this.getClass().getSimpleName());
-        context.getMessenger();
+        messenger = context.getMessenger();
     }
 
     @Override

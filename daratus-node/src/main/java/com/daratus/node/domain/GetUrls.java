@@ -23,8 +23,12 @@ public class GetUrls extends Task {
         String htmlResponse = connector.scrape(targetURL);
         messenger.info("Got response, it is " + (htmlResponse.isEmpty() ? "" : "NOT") + " empty!");
 
-        Document htmlDocument = parseHtmlDocument(htmlResponse, context);
-        setCompleted(buildUrls(htmlDocument, context));
+        boolean hasChanges = false;
+        if(!htmlResponse.isEmpty()){
+            Document htmlDocument = parseHtmlDocument(htmlResponse, context);
+            hasChanges = buildUrls(htmlDocument, context);
+        }
+        setCompleted(hasChanges);
     }
 
 }

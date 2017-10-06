@@ -31,14 +31,16 @@ public class GetData extends Task {
         System.out.println("Requesting HTML data from '" + targetURL + "' website...");
         String htmlResponse = connector.scrape(targetURL);
         messenger.info("Got response, it is " + (htmlResponse.isEmpty() ? "" : "NOT") + " empty!");
-        
-        Document htmlDocument = parseHtmlDocument(htmlResponse, context);
+
         boolean hasChanges = false;
-        if(buildData(htmlDocument, context)){
-            hasChanges = true;
-        }
-        if(buildUrls(htmlDocument, context)){
-            hasChanges = true;
+        if(!htmlResponse.isEmpty()){
+            Document htmlDocument = parseHtmlDocument(htmlResponse, context);
+            if(buildData(htmlDocument, context)){
+                hasChanges = true;
+            }
+            if(buildUrls(htmlDocument, context)){
+                hasChanges = true;
+            }
         }
         setCompleted(hasChanges);
         
