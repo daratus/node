@@ -45,6 +45,7 @@ import com.daratus.node.console.APICommand;
 import com.daratus.node.listeners.ApplicationExitListener;
 import com.daratus.node.listeners.LoginListener;
 import com.daratus.node.listeners.LogoutListener;
+import com.daratus.node.listeners.RegisterListener;
 import com.daratus.node.listeners.StartStopListener;
 import com.daratus.node.listeners.TrayMouseListener;
 
@@ -152,7 +153,8 @@ public class NodeWindow extends JFrame implements ContextObserver{
             centerBox.add(noticeLabel);
             centerBox.add(Box.createVerticalStrut(30));
 
-            LoginListener loginListener = new LoginListener(APICommand.NODE_PATH, context);
+            LoginListener loginListener = new LoginListener(APICommand.NODE_LOGIN_PATH, context);
+            RegisterListener registerListener = new RegisterListener(APICommand.NODE_REGISTER_PATH, context);
             LogoutListener logoutListener = new LogoutListener(context);
             StartStopListener startListener = new StartStopListener(context, true);
             StartStopListener stopListener = new StartStopListener(context, false);
@@ -160,7 +162,7 @@ public class NodeWindow extends JFrame implements ContextObserver{
             // Authentication buttons
             Box mainButtonBox = Box.createHorizontalBox();
             mainButtonBox.setAlignmentX(Component.CENTER_ALIGNMENT);
-                mainButtonBox.add(addWelcomeWindowButton(NodeCommand.REGISTER, new JButton("Register"), loginListener));
+                mainButtonBox.add(addWelcomeWindowButton(NodeCommand.REGISTER, new JButton("Register"), registerListener));
                 mainButtonBox.add(addWelcomeWindowButton(NodeCommand.LOGIN, new JButton("Login"), loginListener));
                 mainButtonBox.add(addWelcomeWindowButton(NodeCommand.LOGOUT, new JButton("Logout"), logoutListener));
             centerBox.add(mainButtonBox);    

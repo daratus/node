@@ -1,6 +1,10 @@
 package com.daratus.node;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -13,10 +17,13 @@ import org.jsoup.helper.W3CDom;
 
 import com.daratus.node.console.APICommand;
 import com.daratus.node.console.AbstractCommand;
+import com.daratus.node.domain.Node;
 import com.daratus.node.domain.NullTask;
 import com.daratus.node.domain.Task;
 import com.daratus.node.domain.TaskObserver;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -41,6 +48,8 @@ public class NodeContext implements TaskObserver, Runnable{
     private boolean isBlocked = false;
     
     private String name = null;
+    
+    private String secretKey = null;
     
     private Task currentTask;
 
@@ -141,6 +150,14 @@ public class NodeContext implements TaskObserver, Runnable{
         }
     }
     
+    public void setSecretKey(String secretKey) {
+        this.secretKey = secretKey;
+    }
+    
+    public String getSecretKey() {
+        return secretKey;
+    }
+    
     public String getName() {
         return name;
     }
@@ -191,6 +208,52 @@ public class NodeContext implements TaskObserver, Runnable{
         currentState.handle(this);
     }
     
+    public void authenticate(String apiPath) {
+        if(!isAuthenticated()){
+            File f = new File("node-key.txt");
+            if(f.exists() && !f.isDirectory()) {
+                String secretKey = null;
+                try {
+                    secretKey = new String(Files.readAllBytes(Paths.get(f.getName())));
+                    secretKey = secretKey.replace("\n", "").replace("\r", "");
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                if (secretKey != null) {
+                    messenger.info("Got secretkey, sending authetication request to Daratus API for node");
+                    String jsonResponse = apiConnector.sendRequest(apiPath + secretKey, RequestMethod.GET);
+                    Node loggedInNode = null;
+                    if(jsonResponse != null && !jsonResponse.isEmpty()){
+                        try {
+                            loggedInNode = new ObjectMapper().readValue(jsonResponse, Node.class);
+                            if (loggedInNode.getId() != null) {
+                                messenger.info("Successfully loged as '" + loggedInNode.getName() + "'!");
+                                setName(loggedInNode.getId().toString());
+                                setSecretKey(secretKey);
+                            }
+                        } catch (JsonParseException e) {
+                            e.printStackTrace();
+                        } catch (JsonMappingException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        messenger.info("Login failed! invalid node key found! Please try to re-register!");
+                    }
+                } else {
+                    messenger.info("Couldn't find node-key, please register at first!!");
+                }
+            } else {
+                messenger.info("Couldn't find node-key, please register at first!!");
+            }
+        }else{
+            messenger.error("User is already authenticated! Please use '" + AbstractCommand.LOGOUT + "' first!");
+        }
+        currentState.handle(this);
+    }
+    
     /**
      * 
      * @see NodeCommand.LOGOUT
@@ -205,6 +268,48 @@ public class NodeContext implements TaskObserver, Runnable{
         currentState.handle(this);
     }
     
+    public void registerNode(String apiPath, Node node) {
+        if(!isAuthenticated()){
+            messenger.info("Sending node registration '" + node.getName() + "'!");
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonString = "";
+            try {
+                jsonString = mapper.writeValueAsString(node);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+            apiConnector.setJsonEntity(jsonString);
+            String jsonResponse = apiConnector.sendRequest(apiPath, RequestMethod.POST);
+            Node registeredNode = null;
+            if(jsonResponse != null){
+                try {
+                    registeredNode = new ObjectMapper().readValue(jsonResponse, Node.class);
+                    if (registeredNode.getId() != null) {
+                        messenger.info("Found node '" + registeredNode.getName() + "' on server! Succesfuly registered!");
+                        PrintWriter writer = new PrintWriter("node-key.txt", "UTF-8");
+                        writer.println(registeredNode.getSecretKey());
+                        writer.close();
+                        setName(registeredNode.getId().toString());
+                        setSecretKey(registeredNode.getSecretKey());
+                    }
+                } catch (JsonParseException e) {
+                    e.printStackTrace();
+                } catch (JsonMappingException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                
+            }
+            if (registeredNode == null) {
+                messenger.info("Node registration failed!");
+            }
+        }else{
+            messenger.error("User is already authenticated! Please use '" + AbstractCommand.LOGOUT + "' first!");
+        }
+        currentState.handle(this);
+    }
+    
     /**
      * 
      * @param apiPath
@@ -212,7 +317,7 @@ public class NodeContext implements TaskObserver, Runnable{
      */
     protected void getNextTask(String apiPath){
         messenger.info("Sending next task request to Daratus API for node ID '" + name + "'!");
-        String jsonResponse = apiConnector.sendRequest(apiPath + getName(), RequestMethod.GET);
+        String jsonResponse = apiConnector.sendRequest(apiPath + getSecretKey(), RequestMethod.GET);
         if(jsonResponse != null){
             try {
                 Task task = mapper.readValue(jsonResponse, Task.class);

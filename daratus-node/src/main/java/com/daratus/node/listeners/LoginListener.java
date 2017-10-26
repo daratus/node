@@ -25,11 +25,12 @@ public class LoginListener implements ActionListener {
     
     @Override
     public void actionPerformed(ActionEvent e) {
-        String nodeId = JOptionPane.showInputDialog("Please enter Node ID!");
+        /*String nodeId = JOptionPane.showInputDialog("Please enter Node ID!");
         
         if(nodeId !=null && !nodeId.isEmpty()){
             context.authenticate(apiPath, nodeId);
-        }
+        }*/
+        context.authenticate(apiPath);
     }
 
 }
