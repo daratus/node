@@ -1,10 +1,11 @@
 package com.daratus.node;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -213,13 +214,22 @@ public class NodeContext implements TaskObserver, Runnable{
             File f = new File("node-key.txt");
             if(f.exists() && !f.isDirectory()) {
                 String secretKey = null;
+                
                 try {
-                    secretKey = new String(Files.readAllBytes(Paths.get(f.getName())));
-                    secretKey = secretKey.replace("\n", "").replace("\r", "");
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+                    FileInputStream fileIn = new FileInputStream(f.getName());
+                    ObjectInputStream in = new ObjectInputStream(fileIn);
+                    secretKey = (String) in.readObject();
+                    in.close();
+                    fileIn.close();
+                }catch(IOException i) {
+                    i.printStackTrace();
+                    return;
+                 }catch(ClassNotFoundException c) {
+                    System.out.println("String class not found");
+                    c.printStackTrace();
+                    return;
+                 }
+                
                 if (secretKey != null) {
                     messenger.info("Got secretkey, sending authetication request to Daratus API for node");
                     String jsonResponse = apiConnector.sendRequest(apiPath + secretKey, RequestMethod.GET);
@@ -286,9 +296,11 @@ public class NodeContext implements TaskObserver, Runnable{
                     registeredNode = new ObjectMapper().readValue(jsonResponse, Node.class);
                     if (registeredNode.getId() != null) {
                         messenger.info("Found node '" + registeredNode.getName() + "' on server! Succesfuly registered!");
-                        PrintWriter writer = new PrintWriter("node-key.txt", "UTF-8");
-                        writer.println(registeredNode.getSecretKey());
-                        writer.close();
+                        FileOutputStream fileOut =new FileOutputStream("node-key.txt");
+                        ObjectOutputStream out = new ObjectOutputStream(fileOut);
+                        out.writeObject(registeredNode.getSecretKey());
+                        out.close();
+                        fileOut.close();
                         setName(registeredNode.getId().toString());
                         setSecretKey(registeredNode.getSecretKey());
                     }
