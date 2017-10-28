@@ -41,8 +41,9 @@ public class DefaultCommand extends AbstractCommand {
             messenger.info("# Current host details: " + host.toURI());
             messenger.info("#");
             messenger.info("# Available commands:");
-            messenger.info("# " + AbstractCommand.REGISTER + " <name> - registers new node, name must be unique.");
-            messenger.info("# " + AbstractCommand.LOGIN + " <id> - logins with existing node.");
+            messenger.info("# " + AbstractCommand.REGISTER + " <user name> <user email> <node name> "
+                    + "- registers new node, name must be unique.");
+            messenger.info("# " + AbstractCommand.LOGIN + " - logins with existing node.");
             messenger.info("# " + AbstractCommand.LOGOUT + " - logouts current node.");
             messenger.info("# " + AbstractCommand.HOST + " <host> <port> <scheme> - updates Daratus API host details.");
             messenger.info("# " + AbstractCommand.HELP + " - prints title and available commands.");
