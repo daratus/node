@@ -4,10 +4,14 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 
 public class RegisterDialog extends JPanel{
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    
     JTextField userNameTextField;
     JTextField userEmailTextField;
     JTextField nodeNameTextField;
