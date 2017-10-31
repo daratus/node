@@ -1,3 +1,3 @@
-# Source code for Web Data Miner Node
+# Web Data Miner Node
 
-To compile and execute node JAVA SDK is required.
+To compile source code and execute node JAVA SDK is required.
