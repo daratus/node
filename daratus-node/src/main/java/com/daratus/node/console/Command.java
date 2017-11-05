@@ -27,6 +27,8 @@ public interface Command {
     
     public static final String EXECUTE = "execute";
     
+    public static final String REFERRAL = "referral";
+    
     public void setParameters(String [] commandParameters);
     
     public boolean evaluate(String commandToken);
