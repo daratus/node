@@ -53,7 +53,7 @@ public class BlockedState extends NodeState{
 
     @Override
     public String getGreeting(NodeContext context) {
-        return "Node ID is '" + context.getName() + "'! Node is operating automaticaly. In order to break the loop press '"+AbstractCommand.STOP+"' button!";
+        return "Node '" + context.getNode().getShortCode() + "' ("+context.getNode().getId()+")! Node is operating automaticaly. In order to break the loop press '"+AbstractCommand.STOP+"' button!";
     }
 
     @Override

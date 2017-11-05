@@ -17,6 +17,10 @@ protected String apiPath = "";
     @Override
     public void execute() {
         context.authenticate(apiPath);
+        if (!context.isAuthenticated()) {
+            context.authenticateThroughCmdLine(apiPath);
+        }
+        //context.authenticate(apiPath);
     }
     
     

@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.daratus.node.console.ConsoleMenssenger;
+import com.daratus.node.domain.Node;
 import com.daratus.node.domain.NullTask;
 
 /**
@@ -16,9 +17,13 @@ import com.daratus.node.domain.NullTask;
  */
 public class OperationalStateTest {
 
-    private final String originalName = "TestName";
+private final String originalName = "TestName";
+    
+    private Node original;
     
     private final String newName = "TestNewName";
+    
+    private Node newNode;
     
     private AuthenticationState initialState;
 
@@ -28,6 +33,12 @@ public class OperationalStateTest {
     
     @Before
     public void setUp() throws Exception {
+        original = new Node();
+        original.setShortCode(originalName);
+        
+        newNode = new Node();
+        newNode.setShortCode(newName);
+        
         initialState = new AuthenticationState();
         context = new NodeContextMockup();
         context.setMessenger(new ConsoleMenssenger(System.out, System.out));
@@ -54,17 +65,17 @@ public class OperationalStateTest {
      */
     @Test
     public void testHandleAuthenticated() {
-        context.setName(originalName);
+        context.setNode(original);
         context.setCurrentState(operationalState);
         operationalState.handle(context);
         assertNotNull(context.getCurrentState());
         assertEquals(operationalState, context.getCurrentState());
         
-        context.setName(newName);
+        context.setNode(newNode);
         operationalState.handle(context);
         assertNotNull(context.getCurrentState());
         assertEquals(operationalState, context.getCurrentState());
-        assertEquals(originalName, context.getName());
+        assertEquals(originalName, context.getNode().getShortCode());
     }
 
     /**
@@ -72,7 +83,7 @@ public class OperationalStateTest {
      */
     @Test
     public void testHandleMissingBlockedState() {
-        context.setName(originalName);
+        context.setNode(original);
         context.setCurrentState(operationalState);
         context.setBlocked(true);
         assertNotNull(context.getCurrentState());
@@ -86,7 +97,7 @@ public class OperationalStateTest {
     public void testHandleSuccessBlockedState() {
         BlockedState blockedState = new BlockedState(initialState, operationalState);
         operationalState.setNextState(blockedState);
-        context.setName(originalName);
+        context.setNode(original);
         context.setCurrentState(operationalState);
         context.setBlocked(true);
         assertNotNull(context.getCurrentState());

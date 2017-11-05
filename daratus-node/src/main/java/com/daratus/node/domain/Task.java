@@ -1,6 +1,7 @@
 package com.daratus.node.domain;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     @Type(value = GetUrls.class),
     @Type(value = NullTask.class)
 })
-public abstract class Task {
+public abstract class Task{
     
     private Long id;
     

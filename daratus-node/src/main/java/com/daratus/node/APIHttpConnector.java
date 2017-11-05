@@ -89,4 +89,9 @@ public class APIHttpConnector extends AbstractHttpConnector implements APIConnec
         return target;
     }
     
+    @Override
+    public void setHost(HttpHost httpHost) {
+        target = httpHost;
+    }
+    
 }

@@ -1,19 +1,23 @@
 package com.daratus.node;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.Scanner;
 import java.util.logging.Logger;
 
 import javax.xml.xpath.XPath;
 
+import org.apache.http.HttpHost;
 import org.jsoup.helper.W3CDom;
 
 import com.daratus.node.console.APICommand;
@@ -22,6 +26,8 @@ import com.daratus.node.domain.Node;
 import com.daratus.node.domain.NullTask;
 import com.daratus.node.domain.Task;
 import com.daratus.node.domain.TaskObserver;
+import com.daratus.node.webapi.responses.WebApiGetReferralUrlResponse;
+import com.daratus.node.webapi.responses.WebApiNodeRegisterResponse;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -35,6 +41,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class NodeContext implements TaskObserver, Runnable{
     
     private APIConnector apiConnector;
+    
+    private APIConnector webApiConnector;
     
     private ScrapingConnector scrapingConnector;
 
@@ -50,7 +58,9 @@ public class NodeContext implements TaskObserver, Runnable{
     
     private String name = null;
     
-    private String secretKey = null;
+    private Node node = null;
+    
+    //private String secretKey = null;
     
     private Task currentTask;
 
@@ -64,8 +74,9 @@ public class NodeContext implements TaskObserver, Runnable{
     
     private Properties properties = new Properties();
     
-    public NodeContext(APIConnector apiConnector, ScrapingConnector scrapingConnector, ObjectMapper mapper, W3CDom w3cDom, XPath xPath) {
+    public NodeContext(APIConnector apiConnector, APIConnector webApiConnector, ScrapingConnector scrapingConnector, ObjectMapper mapper, W3CDom w3cDom, XPath xPath) {
         this.apiConnector = apiConnector;
+        this.webApiConnector = webApiConnector;
         this.scrapingConnector = scrapingConnector;
         this.mapper = mapper;
         this.w3cDom = w3cDom;
@@ -145,26 +156,36 @@ public class NodeContext implements TaskObserver, Runnable{
         return isBlocked;
     }
     
-    public void setName(String name) {
-        if(this.name == null){
-            this.name = name;
+    public void setNode(Node node) {
+        if(this.node == null){
+            this.node = node;
         }
     }
     
-    public void setSecretKey(String secretKey) {
-        this.secretKey = secretKey;
+    public Node getNode() {
+        return node;
     }
+    
+    /*public void setName(String name) {
+        if(this.name == null){
+            this.name = name;
+        }
+    }*/
+    
+    /*public void setSecretKey(String secretKey) {
+        this.secretKey = secretKey;
+    }*/
     
     public String getSecretKey() {
-        return secretKey;
+        return node.getSecretKey();
     }
     
-    public String getName() {
-        return name;
-    }
+    /*public String getName() {
+        return node.getShortCode();
+    }*/
 
     public boolean isAuthenticated(){
-        return name != null;
+        return node != null;
     }
     
     public void setCurrentTask(Task currentTask) {
@@ -195,7 +216,7 @@ public class NodeContext implements TaskObserver, Runnable{
      * @param name
      * @see NodeCommand.LOGIN
      */
-    public void authenticate(String apiPath, String name){
+    /*public void authenticate(String apiPath, String name){
         if(!isAuthenticated()){
             messenger.info("Sending authetication request to Daratus API for node ID '" + name + "'!");
             String jsonResponse = apiConnector.sendRequest(apiPath + name, RequestMethod.GET);
@@ -207,61 +228,164 @@ public class NodeContext implements TaskObserver, Runnable{
             messenger.error("User is already authenticated! Please use '" + AbstractCommand.LOGOUT + "' first!");
         }
         currentState.handle(this);
-    }
+    }*/
     
     public void authenticate(String apiPath) {
         if(!isAuthenticated()){
-            File f = new File("node-key.txt");
-            if(f.exists() && !f.isDirectory()) {
-                String secretKey = null;
-                
+            File file = new File("node.txt");
+            if (file.exists()) {
                 try {
-                    FileInputStream fileIn = new FileInputStream(f.getName());
+                    FileInputStream fileIn = new FileInputStream("node.txt");
                     ObjectInputStream in = new ObjectInputStream(fileIn);
-                    secretKey = (String) in.readObject();
+                    Node node = (Node) in.readObject();
                     in.close();
                     fileIn.close();
-                }catch(IOException i) {
+                    authenticate(apiPath, node);
+                 } catch (IOException i) {
                     i.printStackTrace();
-                    return;
-                 }catch(ClassNotFoundException c) {
-                    System.out.println("String class not found");
+                 } catch (ClassNotFoundException c) {
                     c.printStackTrace();
-                    return;
-                 }
-                
-                if (secretKey != null) {
-                    messenger.info("Got secretkey, sending authetication request to Daratus API for node");
-                    String jsonResponse = apiConnector.sendRequest(apiPath + secretKey, RequestMethod.GET);
-                    Node loggedInNode = null;
-                    if(jsonResponse != null && !jsonResponse.isEmpty()){
-                        try {
-                            loggedInNode = new ObjectMapper().readValue(jsonResponse, Node.class);
-                            if (loggedInNode.getId() != null) {
-                                messenger.info("Successfully loged as '" + loggedInNode.getName() + "'!");
-                                setName(loggedInNode.getId().toString());
-                                setSecretKey(secretKey);
-                            }
-                        } catch (JsonParseException e) {
-                            e.printStackTrace();
-                        } catch (JsonMappingException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        messenger.info("Login failed! invalid node key found! Please try to re-register!");
-                    }
-                } else {
-                    messenger.info("Couldn't find node-key, please register at first!!");
-                }
-            } else {
-                messenger.info("Couldn't find node-key, please register at first!!");
+                 } 
             }
         }else{
             messenger.error("User is already authenticated! Please use '" + AbstractCommand.LOGOUT + "' first!");
         }
         currentState.handle(this);
+    }
+    
+    public void registerThroughCmdLie(String apiPath) {
+        String userEmail = "";
+        while (userEmail.isEmpty()) {
+            messenger.info("Enter email:");
+            Scanner scanner = new Scanner(System.in);
+            userEmail = scanner.nextLine();
+            if (userEmail.isEmpty())
+                messenger.info("Email is empty!");
+        }
+        
+        String ethAddress = "";
+        messenger.info("Enter ethereum address (optional):");
+        Scanner scanner = new Scanner(System.in);
+        ethAddress = scanner.nextLine();
+
+        String refCode = "";
+        messenger.info("Enter your referral code (optional):");
+        scanner = new Scanner(System.in);
+        refCode = scanner.nextLine();
+        
+        Node node = new Node();
+        node.setUserEmail(userEmail);
+        node.setEthAddress(ethAddress);
+        node.setReferalCode(refCode);
+        registerNode(apiPath, node);
+    }
+    
+    public void authenticateThroughCmdLine(String apiPath) {
+        String nodeCode = "";
+        while (nodeCode.isEmpty()) {
+            messenger.info("Enter node code:");
+            Scanner scanner = new Scanner(System.in);
+            nodeCode = scanner.nextLine();
+            if (nodeCode.isEmpty())
+                messenger.info("Node code is empty!");
+        }
+        
+        String nodeSecretKey = "";
+        while (nodeSecretKey.isEmpty()) {
+            messenger.info("Enter node secret key:");
+            Scanner scanner = new Scanner(System.in);
+            nodeSecretKey = scanner.nextLine();
+            if (nodeSecretKey.isEmpty())
+                messenger.info("Node secret key is empty!");
+        }
+        
+        Node node = new Node();
+        node.setSecretKey(nodeSecretKey);
+        node.setShortCode(nodeCode);
+        authenticate(apiPath, node);
+    }
+    
+    public void authenticate(String apiPath, Node node) {
+        if(!isAuthenticated()){
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonString = "";
+            try {
+                jsonString = mapper.writeValueAsString(node);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+            
+            apiConnector.setJsonEntity(jsonString);
+            String jsonResponse = apiConnector.sendRequest(apiPath, RequestMethod.POST);
+            Node loggedInNode = null;
+            if(jsonResponse != null && !jsonResponse.isEmpty()){
+                try {
+                    loggedInNode = new ObjectMapper().readValue(jsonResponse, Node.class);
+                    if (loggedInNode.getId() != null) {
+                        messenger.info("Found node '" + loggedInNode.getShortCode() + "' ("+loggedInNode.getId()+") on server! Successfully logged in!");
+                        this.node = loggedInNode;
+                        //setName(loggedInNode.getId().toString());
+                        //setSecretKey(loggedInNode.getSecretKey());
+                        
+                        File file = new File("node.txt");
+                        if(!file.exists()) {
+                            try {
+                                FileOutputStream fileOut = new FileOutputStream("node.txt");
+                                ObjectOutputStream out = new ObjectOutputStream(fileOut);
+                                out.writeObject(loggedInNode);
+                                out.close();
+                                fileOut.close();
+                             } catch (IOException i) {
+                                i.printStackTrace();
+                             }
+                        }
+                    }
+                } catch (JsonParseException e) {
+                    e.printStackTrace();
+                } catch (JsonMappingException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (loggedInNode == null) {
+                messenger.info("Node login failed!");
+            }
+        }else{
+            messenger.error("User is already authenticated! Please use '" + AbstractCommand.LOGOUT + "' first!");
+        }
+        currentState.handle(this);
+    }
+    
+    public void getReferralLink(String apiPath) {
+        if(isAuthenticated()){
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonString = "";
+            try {
+                jsonString = mapper.writeValueAsString(node);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+            
+            webApiConnector.setJsonEntity(jsonString);
+            String jsonResponse = webApiConnector.sendRequest(apiPath, RequestMethod.POST);
+            if(jsonResponse != null && !jsonResponse.isEmpty()){
+                WebApiGetReferralUrlResponse webApiGetReferralUrlResponse;
+                try {
+                    webApiGetReferralUrlResponse = new ObjectMapper().readValue(jsonResponse, WebApiGetReferralUrlResponse.class);
+                    String url = webApiGetReferralUrlResponse.getBody();
+                    messenger.info("Your referring URL is "+url);
+                    Desktop.getDesktop().browse(new URL(url).toURI());
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    //e.printStackTrace();
+                }
+            }
+        }else{
+            messenger.error("Please register or login to get your referring URL!");
+        }
     }
     
     /**
@@ -270,8 +394,8 @@ public class NodeContext implements TaskObserver, Runnable{
      */
     public void logout(){
         if(isAuthenticated()){
-            messenger.info("Succesfully loged out node ID '" + name + "'!");
-            this.name = null;
+            messenger.info("Succesfully loged out node '" + node.getShortCode() + "' ("+node.getId()+")!");
+            this.node = null;
         }else{
             messenger.warning("Could not logout! There is no node authenticated!");
         }
@@ -280,7 +404,7 @@ public class NodeContext implements TaskObserver, Runnable{
     
     public void registerNode(String apiPath, Node node) {
         if(!isAuthenticated()){
-            messenger.info("Sending node registration '" + node.getName() + "'!");
+            messenger.info("Sending node registration for user '" + node.getUserEmail() + "'!");
             ObjectMapper mapper = new ObjectMapper();
             String jsonString = "";
             try {
@@ -288,21 +412,27 @@ public class NodeContext implements TaskObserver, Runnable{
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
-            apiConnector.setJsonEntity(jsonString);
-            String jsonResponse = apiConnector.sendRequest(apiPath, RequestMethod.POST);
+            webApiConnector.setJsonEntity(jsonString);
+            String jsonResponse = webApiConnector.sendRequest(apiPath, RequestMethod.POST);
+            
             Node registeredNode = null;
-            if(jsonResponse != null){
+            WebApiNodeRegisterResponse webApiNodeRegisterResponse = null;
+            if(jsonResponse != null && !jsonResponse.isEmpty()){
                 try {
-                    registeredNode = new ObjectMapper().readValue(jsonResponse, Node.class);
-                    if (registeredNode.getId() != null) {
-                        messenger.info("Found node '" + registeredNode.getName() + "' on server! Succesfuly registered!");
-                        FileOutputStream fileOut =new FileOutputStream("node-key.txt");
-                        ObjectOutputStream out = new ObjectOutputStream(fileOut);
-                        out.writeObject(registeredNode.getSecretKey());
-                        out.close();
-                        fileOut.close();
-                        setName(registeredNode.getId().toString());
-                        setSecretKey(registeredNode.getSecretKey());
+                    webApiNodeRegisterResponse = new ObjectMapper().readValue(jsonResponse, WebApiNodeRegisterResponse.class);
+                    if (webApiNodeRegisterResponse.getStatus()) {
+                        registeredNode = webApiNodeRegisterResponse.getBody();
+                        if (registeredNode.getId() != null) {
+                            messenger.info("Succesfuly registered with node "+registeredNode.getShortCode()+"("+registeredNode.getId()+"). "+webApiNodeRegisterResponse.getMessage());
+                            FileOutputStream fileOut =new FileOutputStream("node.txt");
+                            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+                            out.writeObject(registeredNode);
+                            out.close();
+                            fileOut.close();
+                            this.node = registeredNode;
+                            //setName(registeredNode.getId().toString());
+                            //setSecretKey(registeredNode.getSecretKey());
+                        }   
                     }
                 } catch (JsonParseException e) {
                     e.printStackTrace();
@@ -314,7 +444,10 @@ public class NodeContext implements TaskObserver, Runnable{
                 
             }
             if (registeredNode == null) {
-                messenger.info("Node registration failed!");
+                if (webApiNodeRegisterResponse != null)
+                    messenger.info("Node registration failed: "+webApiNodeRegisterResponse.getMessage());
+                else
+                    messenger.info("Node registration failed!");
             }
         }else{
             messenger.error("User is already authenticated! Please use '" + AbstractCommand.LOGOUT + "' first!");
@@ -328,7 +461,7 @@ public class NodeContext implements TaskObserver, Runnable{
      * @see NodeCommand.NEXT
      */
     protected void getNextTask(String apiPath){
-        messenger.info("Sending next task request to Daratus API for node ID '" + name + "'!");
+        messenger.info("Sending next task request to Daratus API for node "+ node.getShortCode() +" (" + node.getId() + ")!");
         String jsonResponse = apiConnector.sendRequest(apiPath + getSecretKey(), RequestMethod.GET);
         if(jsonResponse != null){
             try {
@@ -368,8 +501,8 @@ public class NodeContext implements TaskObserver, Runnable{
     private void sendResponse(Task task){
         try {
             apiConnector.setJsonEntity(mapper.writeValueAsString(task));
-            System.out.println("Sending task result response to Daratus API to path '" + APICommand.NEXT_TASK_PATH + getName() + "'!");
-            apiConnector.sendRequest(APICommand.NEXT_TASK_PATH + getName(), RequestMethod.POST);
+            System.out.println("Sending task result response to Daratus API to path '" + APICommand.NEXT_TASK_PATH + getNode().getId() + "'!");
+            apiConnector.sendRequest(APICommand.NEXT_TASK_PATH + getNode().getId(), RequestMethod.POST);
             setCurrentTask(nullTask);
             System.out.println("Result has been sent!");
         } catch (JsonProcessingException e) {

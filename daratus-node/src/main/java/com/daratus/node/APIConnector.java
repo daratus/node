@@ -12,4 +12,6 @@ public interface APIConnector {
     
     public String sendRequest(String path, RequestMethod method);
     
+    public void setHost(HttpHost httpHost);
+    
 }

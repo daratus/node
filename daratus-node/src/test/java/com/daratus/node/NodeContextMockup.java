@@ -5,7 +5,7 @@ import com.daratus.node.domain.NullTask;
 public class NodeContextMockup extends NodeContext {
 
     public NodeContextMockup() {
-        super(null, null, null, null, null);
+        super(null, null, null, null, null, null);
     }
     
     @Override

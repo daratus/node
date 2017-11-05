@@ -12,27 +12,27 @@ public class RegisterDialog extends JPanel{
      */
     private static final long serialVersionUID = 1L;
     
-    JTextField userNameTextField;
     JTextField userEmailTextField;
-    JTextField nodeNameTextField;
+    JTextField ethAddressTextField;
+    JTextField referalCodeTextField;
     
     public RegisterDialog() {
         super();
         
-        JLabel label = new JLabel("Your name");
-        this.add(label);
-        userNameTextField = new JTextField(10);
-        this.add(userNameTextField);
-        
-        label = new JLabel("Your email");
+        JLabel label = new JLabel("Email*");
         this.add(label);
         userEmailTextField = new JTextField(10);
         this.add(userEmailTextField);
         
-        label = new JLabel("Node name");
+        label = new JLabel("Ethereum address");
         this.add(label);
-        nodeNameTextField = new JTextField(10);
-        this.add(nodeNameTextField);
+        ethAddressTextField = new JTextField(25);
+        this.add(ethAddressTextField);
+        
+        label = new JLabel("Referral code");
+        this.add(label);
+        referalCodeTextField = new JTextField(7);
+        this.add(referalCodeTextField);
     }
     
     public int showDialog() {
@@ -43,16 +43,16 @@ public class RegisterDialog extends JPanel{
                 JOptionPane.PLAIN_MESSAGE);
     }
     
-    public String getEnteredUserName() {
-        return userNameTextField.getText();
-    }
-    
     public String getEnteredUserEmail() {
         return userEmailTextField.getText();
     }
     
-    public String getEnteredNodeName() {
-        return nodeNameTextField.getText();
+    public String getEnteredEthAddress() {
+        return ethAddressTextField.getText();
+    }
+    
+    public String getEnteredReferalCode() {
+        return referalCodeTextField.getText();
     }
     
 }

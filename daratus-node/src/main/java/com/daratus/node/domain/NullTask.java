@@ -1,5 +1,7 @@
 package com.daratus.node.domain;
 
+import java.io.Serializable;
+
 import com.daratus.node.NodeContext;
 
 /**
@@ -7,7 +9,7 @@ import com.daratus.node.NodeContext;
  * @author Zilvinas Vaira
  *
  */
-public class NullTask extends Task {
+public class NullTask extends Task implements Serializable {
 
     public static final long SECONDS_CONVERSION_RATE = 1000L;
     

@@ -24,21 +24,21 @@ public class RegisterCommand extends AbstractParametrizedCommand implements APIC
 
     @Override
     public void parseParameters(String[] commandParameters) {
-        if(commandParameters.length > 3){
+        /*if(commandParameters.length > 3){
             node = new Node();
-            node.setUserName(commandParameters[1]);
+            //node.setUserName(commandParameters[1]);
             node.setUserEmail(commandParameters[2]);
             node.setName(commandParameters[3]);
         }else{
             String commandToken = commandParameters.length > 0 ? commandParameters[0] : "unknown";
             logger.warning("Required parameter is missing for command '" + commandToken + "'!");
-        }
+        }*/
     }
     
     @Override
     public void doExecute() {
-        if(node != null){
-            context.registerNode(apiPath, node);
+        if (!context.isAuthenticated()) {
+            context.registerThroughCmdLie(apiPath);
         }
     }
 

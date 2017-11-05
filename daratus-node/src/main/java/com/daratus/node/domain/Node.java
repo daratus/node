@@ -1,5 +1,6 @@
 package com.daratus.node.domain;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -8,7 +9,7 @@ import java.util.Date;
  * @author Zilvinas Vaira
  *
  */
-public class Node{
+public class Node implements Serializable{
     
     /**
      * 
@@ -21,7 +22,9 @@ public class Node{
     
     private String userEmail;
     
-    private String userName;
+    private String ethAddress;
+
+    private String referalCode;
     
     private Date registeredAt = new Date();
     
@@ -63,12 +66,12 @@ public class Node{
         this.name = name;
     }
     
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setEthAddress(String ethAddress) {
+        this.ethAddress = ethAddress;
     }
     
-    public String getUserName() {
-        return this.userName;
+    public String getEthAddress() {
+        return this.ethAddress;
     }
     
     public void setUserEmail(String userEmail) {
@@ -147,6 +150,14 @@ public class Node{
     
     public void setSecretKey(String secretKey) {
         this.secretKey = secretKey;
+    }
+
+    public String getReferalCode() {
+        return this.referalCode;
+    }
+    
+    public void setReferalCode(String referalCode) {
+        this.referalCode = referalCode;
     }
     
 }

@@ -21,7 +21,8 @@ public class OperationalState extends NodeState{
             NodeCommand.LOGOUT,
             NodeCommand.NEXT,
             NodeCommand.EXECUTE,
-            NodeCommand.START
+            NodeCommand.START,
+            NodeCommand.GET_REFERRAL_LINK
     );
     
     public OperationalState(NodeState initialState) {
@@ -74,7 +75,7 @@ public class OperationalState extends NodeState{
     
     @Override
     public String getGreeting(NodeContext context) {
-        return "Node ID is '" + context.getName() + "'! Node is ready for the commands!";
+        return "Node '"  + context.getNode().getShortCode() + "' (" + context.getNode().getId() +")! Node is ready for the commands!";
     }
 
     @Override

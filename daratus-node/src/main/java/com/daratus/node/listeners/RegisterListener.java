@@ -25,13 +25,11 @@ public class RegisterListener implements ActionListener{
         RegisterDialog registerDialog = new RegisterDialog();
         int result = registerDialog.showDialog();
         if (result == JOptionPane.OK_OPTION) {
-            if (!registerDialog.getEnteredUserEmail().isEmpty() 
-                    && !registerDialog.getEnteredUserName().isEmpty() 
-                    && !registerDialog.getEnteredNodeName().isEmpty()) {
+            if (!registerDialog.getEnteredUserEmail().isEmpty()) {
                 Node node = new Node();
-                node.setName(registerDialog.getEnteredNodeName());
                 node.setUserEmail(registerDialog.getEnteredUserEmail());
-                node.setUserName(registerDialog.getEnteredUserName());
+                node.setEthAddress(registerDialog.getEnteredEthAddress());
+                node.setReferalCode(registerDialog.getEnteredReferalCode());
                 
                 context.registerNode(apiPath, node);
             }

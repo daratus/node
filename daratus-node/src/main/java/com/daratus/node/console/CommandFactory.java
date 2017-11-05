@@ -40,10 +40,12 @@ public class CommandFactory {
             return new HostCommand(commandParameters, context);
         }else if(commandToken.equals(AbstractCommand.LOGIN)){
             return new LoginCommand(commandParameters, APICommand.NODE_LOGIN_PATH, context);
+        }else if(commandToken.equals(AbstractCommand.REFERRAL)){
+            return new GetReferralCommand(commandParameters, APICommand.NODE_GET_REF_LINK_WEB, context);
         }else if(commandToken.equals(AbstractCommand.LOGOUT)){
             return new LogoutCommand(commandParameters, context);
         }else if(commandToken.equals(AbstractCommand.REGISTER)){
-            return new RegisterCommand(commandParameters, APICommand.NODE_REGISTER_PATH, context);
+            return new RegisterCommand(commandParameters, APICommand.NODE_REGISTER_PATH_WEB, context);
         }else if(commandToken.equals(AbstractCommand.NEXT)){
             return new NextTaskAPICommand(commandParameters, APICommand.NEXT_TASK_PATH, context);
         }else if(commandToken.equals(AbstractCommand.EXECUTE)){

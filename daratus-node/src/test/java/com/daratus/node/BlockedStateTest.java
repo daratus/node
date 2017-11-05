@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.daratus.node.console.ConsoleMenssenger;
+import com.daratus.node.domain.Node;
 import com.daratus.node.domain.NullTask;
 
 /**
@@ -18,7 +19,11 @@ public class BlockedStateTest {
 
     private final String originalName = "TestName";
     
+    private Node original;
+    
     private final String newName = "TestNewName";
+    
+    private Node newNode;
     
     private AuthenticationState initialState;
 
@@ -30,6 +35,12 @@ public class BlockedStateTest {
     
     @Before
     public void setUp() throws Exception {
+        original = new Node();
+        original.setShortCode(originalName);
+        
+        newNode = new Node();
+        newNode.setShortCode(newName);
+        
         initialState = new AuthenticationState();
         context = new NodeContextMockup();
         context.setMessenger(new ConsoleMenssenger(System.out, System.out));
@@ -52,7 +63,7 @@ public class BlockedStateTest {
         assertEquals(initialState, context.getCurrentState());
         
         context.setCurrentState(blockedState);
-        context.setName(originalName);
+        context.setNode(original);
         blockedState.handle(context);
         assertNotNull(context.getCurrentState());
         assertEquals(operationalState, context.getCurrentState());
@@ -64,16 +75,16 @@ public class BlockedStateTest {
     @Test
     public void testHandleBlockedState() {
         context.setCurrentState(blockedState);
-        context.setName(originalName);
+        context.setNode(original);
         context.setBlocked(true);
         assertNotNull(context.getCurrentState());
         assertEquals(blockedState, context.getCurrentState());
         
-        context.setName(newName);
+        context.setNode(newNode);
         blockedState.handle(context);
         assertNotNull(context.getCurrentState());
         assertEquals(blockedState, context.getCurrentState());
-        assertEquals(originalName, context.getName());
+        assertEquals(originalName, context.getNode().getShortCode());
     }
     
     /**
@@ -82,7 +93,7 @@ public class BlockedStateTest {
     @Test
     public void testHandleLogout() {
         context.setCurrentState(blockedState);
-        context.setName(originalName);
+        context.setNode(original);
         context.setBlocked(true);
         assertNotNull(context.getCurrentState());
         assertEquals(blockedState, context.getCurrentState());
@@ -100,7 +111,7 @@ public class BlockedStateTest {
     public void testHandleStop() {
         context.setCurrentState(operationalState);
         operationalState.setNextState(blockedState);
-        context.setName(originalName);
+        context.setNode(original);
         context.setBlocked(true);
         assertNotNull(context.getCurrentState());
         assertEquals(blockedState, context.getCurrentState());

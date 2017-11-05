@@ -23,7 +23,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class ConsoleApplication {
     public static void main(String[] args) {
 
-        APIHttpConnector apiConnector = new APIHttpConnector("mvp.daratus.com", 8080, "http");
+        APIHttpConnector apiConnector = new APIHttpConnector("localhost", 8080, "http");
+        APIHttpConnector webApiConnector = new APIHttpConnector("daratus.dev", 80, "http");
+        
         ScrapingHttpConnector scrappingConnector = new ScrapingHttpConnector();
         ObjectMapper mapper = new ObjectMapper();
 
@@ -38,7 +40,7 @@ public class ConsoleApplication {
         NodeState runningState = new BlockedState(initialState, logedinState);
         logedinState.setNextState(runningState);
 
-        NodeContext context = new NodeContext(apiConnector, scrappingConnector, mapper, w3cDom, xPath);
+        NodeContext context = new NodeContext(apiConnector, webApiConnector, scrappingConnector, mapper, w3cDom, xPath);
         context.setMessenger(new ConsoleMenssenger(System.out, System.err));
         context.setCurrentState(initialState);
 

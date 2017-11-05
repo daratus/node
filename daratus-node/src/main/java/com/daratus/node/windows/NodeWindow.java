@@ -43,9 +43,11 @@ import com.daratus.node.NodeContext;
 import com.daratus.node.NodeState;
 import com.daratus.node.console.APICommand;
 import com.daratus.node.listeners.ApplicationExitListener;
+import com.daratus.node.listeners.GetReferralListener;
 import com.daratus.node.listeners.LoginListener;
 import com.daratus.node.listeners.LogoutListener;
 import com.daratus.node.listeners.RegisterListener;
+//import com.daratus.node.listeners.RegisterListener;
 import com.daratus.node.listeners.StartStopListener;
 import com.daratus.node.listeners.TrayMouseListener;
 
@@ -154,10 +156,11 @@ public class NodeWindow extends JFrame implements ContextObserver{
             centerBox.add(Box.createVerticalStrut(30));
 
             LoginListener loginListener = new LoginListener(APICommand.NODE_LOGIN_PATH, context);
-            RegisterListener registerListener = new RegisterListener(APICommand.NODE_REGISTER_PATH, context);
+            RegisterListener registerListener = new RegisterListener(APICommand.NODE_REGISTER_PATH_WEB, context);
             LogoutListener logoutListener = new LogoutListener(context);
             StartStopListener startListener = new StartStopListener(context, true);
             StartStopListener stopListener = new StartStopListener(context, false);
+            GetReferralListener referralListener = new GetReferralListener(APICommand.NODE_GET_REF_LINK_WEB, context);
             
             // Authentication buttons
             Box mainButtonBox = Box.createHorizontalBox();
@@ -173,6 +176,7 @@ public class NodeWindow extends JFrame implements ContextObserver{
             nodeButtonBox.setAlignmentX(Component.CENTER_ALIGNMENT);
                 nodeButtonBox.add(addWelcomeWindowButton(NodeCommand.START, new JButton("Start"), startListener));
                 nodeButtonBox.add(addWelcomeWindowButton(NodeCommand.STOP, new JButton("Stop"), stopListener));
+                nodeButtonBox.add(addWelcomeWindowButton(NodeCommand.GET_REFERRAL_LINK, new JButton("Get Referral Link"), referralListener));
             centerBox.add(nodeButtonBox);    
             centerBox.add(Box.createVerticalStrut(30));
             
@@ -206,7 +210,7 @@ public class NodeWindow extends JFrame implements ContextObserver{
             popupMenu = new PopupMenu();
 
             // MENU
-            addTrayMenuItem(NodeCommand.REGISTER, "Register", loginListener);
+            //addTrayMenuItem(NodeCommand.REGISTER, "Register", loginListener);
             addTrayMenuItem(NodeCommand.LOGIN, "Login", loginListener);
             addTrayMenuItem(NodeCommand.LOGOUT, "Logout", logoutListener);
             addTrayMenuItem("Node Info");

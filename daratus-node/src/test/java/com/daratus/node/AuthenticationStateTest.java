@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.daratus.node.console.ConsoleMenssenger;
+import com.daratus.node.domain.Node;
 
 /**
  * 
@@ -20,6 +21,8 @@ import com.daratus.node.console.ConsoleMenssenger;
 public class AuthenticationStateTest {
 
     private final String name = "TestName";
+    
+    private Node node;
 
     private NodeContextMockup context;
     
@@ -27,6 +30,8 @@ public class AuthenticationStateTest {
     
     @Before
     public void setUp() throws Exception {
+        node = new Node();
+        node.setShortCode(name);
         context = new NodeContextMockup();
         context.setMessenger(new ConsoleMenssenger(System.out, System.out));
         initialState = new AuthenticationState();
@@ -58,7 +63,7 @@ public class AuthenticationStateTest {
     @Test
     public void testHandleMissingNextState() {
         context.setCurrentState(initialState);
-        context.setName(name);
+        context.setNode(node);
         initialState.handle(context);
         assertNotNull(context.getCurrentState());
         assertEquals(initialState, context.getCurrentState());
@@ -70,7 +75,7 @@ public class AuthenticationStateTest {
     @Test
     public void testHandleSuccessAuthentication() {
         context.setCurrentState(initialState);
-        context.setName(name);
+        context.setNode(node);
         initialState.setNextState(new OperationalState(initialState));
         initialState.handle(context);
         assertNotNull(context.getCurrentState());

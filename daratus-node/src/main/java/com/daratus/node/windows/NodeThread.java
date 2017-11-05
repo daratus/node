@@ -6,6 +6,7 @@ import javax.swing.JFrame;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.http.HttpHost;
 import org.jsoup.helper.W3CDom;
 
 import com.daratus.node.APIHttpConnector;
@@ -22,7 +23,9 @@ public class NodeThread implements Runnable {
     @Override
     public void run() {
 
-        APIHttpConnector apiConnector = new APIHttpConnector("mvp.daratus.com", 8080, "http");
+        APIHttpConnector apiConnector = new APIHttpConnector("localhost", 8080, "http");
+        APIHttpConnector webApiConnector = new APIHttpConnector("daratus.dev", 80, "http");
+
         ScrapingHttpConnector scrappingConnector = new ScrapingHttpConnector();
         ObjectMapper mapper = new ObjectMapper();
 
@@ -37,7 +40,7 @@ public class NodeThread implements Runnable {
         NodeState runningState = new BlockedState(initialState, logedinState);
         logedinState.setNextState(runningState);
         
-        NodeContext context = new NodeContext(apiConnector, scrappingConnector, mapper, w3cDom, xPath);
+        NodeContext context = new NodeContext(apiConnector, webApiConnector, scrappingConnector, mapper, w3cDom, xPath);
         Properties properties = context.getProperties();
         String version = properties.getProperty("version");
         String title = properties.getProperty("title");

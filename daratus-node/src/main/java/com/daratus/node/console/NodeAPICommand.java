@@ -54,7 +54,7 @@ public class NodeAPICommand extends AbstractParametrizedCommand implements APICo
     @Override
     public void doExecute() {
         if(commandParameters.length > 1){
-            context.authenticate(apiPath, name);
+            //context.authenticate(apiPath, name);
         }
     }
 
