@@ -6,7 +6,6 @@ import javax.swing.JFrame;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
-import org.apache.http.HttpHost;
 import org.jsoup.helper.W3CDom;
 
 import com.daratus.node.APIHttpConnector;

@@ -17,7 +17,6 @@ import java.util.logging.Logger;
 
 import javax.xml.xpath.XPath;
 
-import org.apache.http.HttpHost;
 import org.jsoup.helper.W3CDom;
 
 import com.daratus.node.console.APICommand;
@@ -56,7 +55,7 @@ public class NodeContext implements TaskObserver, Runnable{
     
     private boolean isBlocked = false;
     
-    private String name = null;
+    //private String name = null;
     
     private Node node = null;
     
@@ -253,6 +252,11 @@ public class NodeContext implements TaskObserver, Runnable{
         currentState.handle(this);
     }
     
+    /**
+     * 
+     * @deprecated Should not contain any console based code! This introduces unnecessary coupling. Multiple scanner instantiations trash the memory.
+     * @param apiPath
+     */
     public void registerThroughCmdLie(String apiPath) {
         String userEmail = "";
         while (userEmail.isEmpty()) {
@@ -280,6 +284,11 @@ public class NodeContext implements TaskObserver, Runnable{
         registerNode(apiPath, node);
     }
     
+    /**
+     * 
+     * @deprecated Should not contain any console based code! This introduces unnecessary coupling. Multiple scanner instantiations trash the memory.
+     * @param apiPath
+     */
     public void authenticateThroughCmdLine(String apiPath) {
         String nodeCode = "";
         while (nodeCode.isEmpty()) {

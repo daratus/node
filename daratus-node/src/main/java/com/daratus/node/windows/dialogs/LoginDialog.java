@@ -7,8 +7,14 @@ import javax.swing.JTextField;
 
 public class LoginDialog extends JPanel{
 
-    JTextField nodeCodeField;
-    JTextField nodeSecretKeyField;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1001L;
+    
+    private JTextField nodeCodeField;
+    
+    private JTextField nodeSecretKeyField;
     
     public LoginDialog() {
         super();
@@ -23,6 +29,10 @@ public class LoginDialog extends JPanel{
         this.add(nodeSecretKeyField);
     }
     
+    /**
+     * @deprecated Something is just not right here.
+     * @return
+     */
     public int showDialog() {
         return JOptionPane.showConfirmDialog(null,
                 this,

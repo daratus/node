@@ -8,7 +8,6 @@ import javax.swing.JOptionPane;
 import com.daratus.node.NodeContext;
 import com.daratus.node.domain.Node;
 import com.daratus.node.windows.dialogs.LoginDialog;
-import com.daratus.node.windows.dialogs.RegisterDialog;
 
 /**
  * 

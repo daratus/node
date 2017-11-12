@@ -14,6 +14,11 @@ public class Node implements Serializable{
     /**
      * 
      */
+    private static final long serialVersionUID = 1001L;
+
+    /**
+     * 
+     */
     private Long id;
 
     private String shortCode = "";

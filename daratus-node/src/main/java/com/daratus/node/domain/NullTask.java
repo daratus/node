@@ -11,6 +11,11 @@ import com.daratus.node.NodeContext;
  */
 public class NullTask extends Task implements Serializable {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1001L;
+
     public static final long SECONDS_CONVERSION_RATE = 1000L;
     
     private int sleepInterval = 3;

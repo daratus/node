@@ -1,7 +1,5 @@
 package com.daratus.node.webapi.responses;
 
-import com.daratus.node.domain.Node;
-
 public class WebApiGetReferralUrlResponse {
 
 private boolean status;
