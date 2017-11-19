@@ -19,15 +19,17 @@ public abstract class AbstractParametrizedCommand extends AbstractCommand{
      * 
      */
     public void execute() {
-        parseParameters(commandParameters);
-        doExecute();
+        if(parseParameters(commandParameters)) {
+            doExecute();
+        }
     }
 
     /**
      * 
      * @param commandParameters
+     * @return
      */
-    protected abstract void parseParameters(String [] commandParameters);
+    protected abstract boolean parseParameters(String [] commandParameters);
     
     /**
      * 

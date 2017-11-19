@@ -5,7 +5,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class LoginDialog extends JPanel{
+public class LoginDialogPanel extends JPanel{
 
     /**
      * 
@@ -16,7 +16,7 @@ public class LoginDialog extends JPanel{
     
     private JTextField nodeSecretKeyField;
     
-    public LoginDialog() {
+    public LoginDialogPanel() {
         super();
         JLabel label = new JLabel("Node code");
         this.add(label);
@@ -30,7 +30,7 @@ public class LoginDialog extends JPanel{
     }
     
     /**
-     * @deprecated Something is just not right here.
+     * 
      * @return
      */
     public int showDialog() {

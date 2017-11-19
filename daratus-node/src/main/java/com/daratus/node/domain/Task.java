@@ -46,7 +46,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 })
 public abstract class Task{
     
-    private Long id;
+    private Long taskId = null;
     
     protected String targetURL = "";
     
@@ -62,6 +62,14 @@ public abstract class Task{
 
     @Deprecated
     private Random randomizer = new Random();
+
+    public void setId(Long id) {
+        this.taskId = id;
+    }
+    
+    public Long getTaskId(){
+        return taskId;
+    }
     
     public void setTargetURL(String targetURL) {
         this.targetURL = targetURL;

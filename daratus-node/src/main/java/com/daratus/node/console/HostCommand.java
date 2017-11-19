@@ -15,7 +15,11 @@ import com.daratus.node.NodeMessenger;
  */
 public class HostCommand extends AbstractParametrizedCommand {
 
-    private APIConnector apiConnector;
+    private final APIConnector apiConnector;
+
+    private final Logger logger;
+    
+    private final NodeMessenger messenger;
     
     private String host = "";
     
@@ -23,11 +27,6 @@ public class HostCommand extends AbstractParametrizedCommand {
     
     private String scheme = "";
     
-    private boolean hasRequiredParameters = false;
-
-    private Logger logger;
-    
-    private NodeMessenger messenger;
     
     public HostCommand(String[] commandParameters, NodeContext context) {
         super(commandParameters);
@@ -37,8 +36,8 @@ public class HostCommand extends AbstractParametrizedCommand {
     }
 
     @Override
-    protected void parseParameters(String[] commandParameters) {
-        hasRequiredParameters = commandParameters.length > 3;
+    protected boolean parseParameters(String[] commandParameters) {
+        boolean hasRequiredParameters = commandParameters.length > 3;
         if(hasRequiredParameters){
             host = commandParameters[1];
             port = Integer.valueOf(commandParameters[2]);
@@ -47,15 +46,14 @@ public class HostCommand extends AbstractParametrizedCommand {
             String commandToken = commandParameters.length > 0 ? commandParameters[0] : "unknown";
             logger.warning("One or more required parameters are missing for command '" + commandToken + "'!");
         }
+        return hasRequiredParameters;
     }
 
     @Override
     public void doExecute() {
-        if(hasRequiredParameters){
-            apiConnector.setHostDetails(host, port, scheme);
-            HttpHost host = apiConnector.getHost();
-            messenger.info("Host has been updated to '"+host.toURI()+"'!");
-        }
+        apiConnector.setHostDetails(host, port, scheme);
+        HttpHost host = apiConnector.getHost();
+        messenger.info("Host has been updated to '"+host.toURI()+"'!");
     }
 
 }

@@ -3,6 +3,7 @@ package com.daratus.node.console;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.daratus.node.APIConnector;
 import com.daratus.node.NodeContext;
 
 public class CommandFactory {
@@ -39,15 +40,15 @@ public class CommandFactory {
         }else if(commandToken.equals(AbstractCommand.HOST)){
             return new HostCommand(commandParameters, context);
         }else if(commandToken.equals(AbstractCommand.LOGIN)){
-            return new LoginCommand(commandParameters, APICommand.NODE_LOGIN_PATH, context);
+            return new LoginAPICommand(commandParameters, APIConnector.NODE_LOGIN_PATH, context);
         }else if(commandToken.equals(AbstractCommand.REFERRAL)){
-            return new GetReferralCommand(commandParameters, APICommand.NODE_GET_REF_LINK_WEB, context);
+            return new ReferralAPICommand(commandParameters, APIConnector.NODE_WEB_REFERRAL_PATH, context);
         }else if(commandToken.equals(AbstractCommand.LOGOUT)){
             return new LogoutCommand(commandParameters, context);
         }else if(commandToken.equals(AbstractCommand.REGISTER)){
-            return new RegisterCommand(commandParameters, APICommand.NODE_REGISTER_PATH_WEB, context);
+            return new RegisterAPICommand(commandParameters, APIConnector.NODE_REGISTER_PATH, context);
         }else if(commandToken.equals(AbstractCommand.NEXT)){
-            return new NextTaskAPICommand(commandParameters, APICommand.NEXT_TASK_PATH, context);
+            return new NextTaskAPICommand(commandParameters, APIConnector.NEXT_TASK_PATH, context);
         }else if(commandToken.equals(AbstractCommand.EXECUTE)){
             return new TaskCommand(commandParameters, context);
         }else if(commandToken.equals(AbstractCommand.START)){

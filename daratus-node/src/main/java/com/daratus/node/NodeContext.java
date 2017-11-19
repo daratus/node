@@ -7,19 +7,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
-import java.util.Scanner;
 import java.util.logging.Logger;
 
 import javax.xml.xpath.XPath;
 
 import org.jsoup.helper.W3CDom;
 
-import com.daratus.node.console.APICommand;
 import com.daratus.node.console.AbstractCommand;
 import com.daratus.node.domain.Node;
 import com.daratus.node.domain.NullTask;
@@ -27,9 +26,7 @@ import com.daratus.node.domain.Task;
 import com.daratus.node.domain.TaskObserver;
 import com.daratus.node.webapi.responses.WebApiGetReferralUrlResponse;
 import com.daratus.node.webapi.responses.WebApiNodeRegisterResponse;
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -38,6 +35,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  */
 public class NodeContext implements TaskObserver, Runnable{
+    
+    public static final String NODE_CONFIG_FILE_NAME = "node.drt";
     
     private APIConnector apiConnector;
     
@@ -55,11 +54,7 @@ public class NodeContext implements TaskObserver, Runnable{
     
     private boolean isBlocked = false;
     
-    //private String name = null;
-    
     private Node node = null;
-    
-    //private String secretKey = null;
     
     private Task currentTask;
 
@@ -108,6 +103,10 @@ public class NodeContext implements TaskObserver, Runnable{
 
     public APIConnector getAPIConnector() {
         return apiConnector;
+    }
+
+    public APIConnector getWebAPIConnector() {
+        return webApiConnector;
     }
     
     public ScrapingConnector getScrapingConnector() {
@@ -165,24 +164,10 @@ public class NodeContext implements TaskObserver, Runnable{
         return node;
     }
     
-    /*public void setName(String name) {
-        if(this.name == null){
-            this.name = name;
-        }
-    }*/
-    
-    /*public void setSecretKey(String secretKey) {
-        this.secretKey = secretKey;
-    }*/
-    
     public String getSecretKey() {
         return node.getSecretKey();
     }
     
-    /*public String getName() {
-        return node.getShortCode();
-    }*/
-
     public boolean isAuthenticated(){
         return node != null;
     }
@@ -211,109 +196,50 @@ public class NodeContext implements TaskObserver, Runnable{
     
     /**
      * 
-     * @param apiPath
-     * @param name
-     * @see NodeCommand.LOGIN
+     * @return
      */
-    /*public void authenticate(String apiPath, String name){
-        if(!isAuthenticated()){
-            messenger.info("Sending authetication request to Daratus API for node ID '" + name + "'!");
-            String jsonResponse = apiConnector.sendRequest(apiPath + name, RequestMethod.GET);
-            if(jsonResponse != null){
-                setName(name);
-                messenger.info("Found node ID '" + name + "' on server! Succesfuly authenticated!");
-            }
-        }else{
-            messenger.error("User is already authenticated! Please use '" + AbstractCommand.LOGOUT + "' first!");
+    public Node createNodeFromFile() {
+        File file = new File(NODE_CONFIG_FILE_NAME);
+        Node node = null;
+        if (file.exists()) {
+            try {
+                FileInputStream fileInput = new FileInputStream(file);
+                ObjectInputStream objectInput = new ObjectInputStream(fileInput);
+                node = (Node) objectInput.readObject();
+                objectInput.close();
+                fileInput.close();
+             } catch (IOException | ClassNotFoundException i) {
+                 logger.warning("Could not read Node details from file '" + NODE_CONFIG_FILE_NAME + "'!");
+             } 
         }
-        currentState.handle(this);
-    }*/
-    
-    public void authenticate(String apiPath) {
-        if(!isAuthenticated()){
-            File file = new File("node.txt");
-            if (file.exists()) {
-                try {
-                    FileInputStream fileIn = new FileInputStream("node.txt");
-                    ObjectInputStream in = new ObjectInputStream(fileIn);
-                    Node node = (Node) in.readObject();
-                    in.close();
-                    fileIn.close();
-                    authenticate(apiPath, node);
-                 } catch (IOException i) {
-                    i.printStackTrace();
-                 } catch (ClassNotFoundException c) {
-                    c.printStackTrace();
-                 } 
-            }
-        }else{
-            messenger.error("User is already authenticated! Please use '" + AbstractCommand.LOGOUT + "' first!");
-        }
-        currentState.handle(this);
+        return node;
     }
     
     /**
      * 
-     * @deprecated Should not contain any console based code! This introduces unnecessary coupling. Multiple scanner instantiations trash the memory.
-     * @param apiPath
+     * @param node
      */
-    public void registerThroughCmdLie(String apiPath) {
-        String userEmail = "";
-        while (userEmail.isEmpty()) {
-            messenger.info("Enter email:");
-            Scanner scanner = new Scanner(System.in);
-            userEmail = scanner.nextLine();
-            if (userEmail.isEmpty())
-                messenger.info("Email is empty!");
+    public void storeNodeTofile(Node node){
+        File file = new File(NODE_CONFIG_FILE_NAME);
+        if(!file.exists()) {
+            try {
+                FileOutputStream fileOutput = new FileOutputStream(file);
+                ObjectOutputStream objectOutput = new ObjectOutputStream(fileOutput);
+                objectOutput.writeObject(node);
+                objectOutput.close();
+                fileOutput.close();
+             } catch (IOException i) {
+                 logger.warning("Could not write Node details to file '" + NODE_CONFIG_FILE_NAME + "'!");
+             }
         }
-        
-        String ethAddress = "";
-        messenger.info("Enter ethereum address (optional):");
-        Scanner scanner = new Scanner(System.in);
-        ethAddress = scanner.nextLine();
-
-        String refCode = "";
-        messenger.info("Enter your referral code (optional):");
-        scanner = new Scanner(System.in);
-        refCode = scanner.nextLine();
-        
-        Node node = new Node();
-        node.setUserEmail(userEmail);
-        node.setEthAddress(ethAddress);
-        node.setReferalCode(refCode);
-        registerNode(apiPath, node);
     }
     
     /**
      * 
-     * @deprecated Should not contain any console based code! This introduces unnecessary coupling. Multiple scanner instantiations trash the memory.
      * @param apiPath
+     * @param node
+     * @see NodeCommand.REGISTER
      */
-    public void authenticateThroughCmdLine(String apiPath) {
-        String nodeCode = "";
-        while (nodeCode.isEmpty()) {
-            messenger.info("Enter node code:");
-            Scanner scanner = new Scanner(System.in);
-            nodeCode = scanner.nextLine();
-            if (nodeCode.isEmpty())
-                messenger.info("Node code is empty!");
-        }
-        
-        String nodeSecretKey = "";
-        while (nodeSecretKey.isEmpty()) {
-            messenger.info("Enter node secret key:");
-            Scanner scanner = new Scanner(System.in);
-            nodeSecretKey = scanner.nextLine();
-            if (nodeSecretKey.isEmpty())
-                messenger.info("Node secret key is empty!");
-        }
-        
-        Node node = new Node();
-        node.setSecretKey(nodeSecretKey);
-        node.setShortCode(nodeCode);
-        authenticate(apiPath, node);
-    }
-    
     public void authenticate(String apiPath, Node node) {
         if(!isAuthenticated()){
             ObjectMapper mapper = new ObjectMapper();
@@ -326,38 +252,20 @@ public class NodeContext implements TaskObserver, Runnable{
             
             apiConnector.setJsonEntity(jsonString);
             String jsonResponse = apiConnector.sendRequest(apiPath, RequestMethod.POST);
-            Node loggedInNode = null;
+            Node loginNode = null;
             if(jsonResponse != null && !jsonResponse.isEmpty()){
                 try {
-                    loggedInNode = new ObjectMapper().readValue(jsonResponse, Node.class);
-                    if (loggedInNode.getId() != null) {
-                        messenger.info("Found node '" + loggedInNode.getShortCode() + "' ("+loggedInNode.getId()+") on server! Successfully logged in!");
-                        this.node = loggedInNode;
-                        //setName(loggedInNode.getId().toString());
-                        //setSecretKey(loggedInNode.getSecretKey());
-                        
-                        File file = new File("node.txt");
-                        if(!file.exists()) {
-                            try {
-                                FileOutputStream fileOut = new FileOutputStream("node.txt");
-                                ObjectOutputStream out = new ObjectOutputStream(fileOut);
-                                out.writeObject(loggedInNode);
-                                out.close();
-                                fileOut.close();
-                             } catch (IOException i) {
-                                i.printStackTrace();
-                             }
-                        }
+                    loginNode = new ObjectMapper().readValue(jsonResponse, Node.class);
+                    if (loginNode.getId() != null) {
+                        this.node = loginNode;
+                        messenger.info("Found node '" + loginNode.getShortCode() + "' ("+loginNode.getId()+") on server! Successfully logged in!");
+                        storeNodeTofile(loginNode);
                     }
-                } catch (JsonParseException e) {
-                    e.printStackTrace();
-                } catch (JsonMappingException e) {
-                    e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-            if (loggedInNode == null) {
+            if (loginNode == null) {
                 messenger.info("Node login failed!");
             }
         }else{
@@ -366,6 +274,10 @@ public class NodeContext implements TaskObserver, Runnable{
         currentState.handle(this);
     }
     
+    /**
+     * @param apiPath
+     * @see NodeCommand.REFERRAL
+     */
     public void getReferralLink(String apiPath) {
         if(isAuthenticated()){
             ObjectMapper mapper = new ObjectMapper();
@@ -383,13 +295,10 @@ public class NodeContext implements TaskObserver, Runnable{
                 try {
                     webApiGetReferralUrlResponse = new ObjectMapper().readValue(jsonResponse, WebApiGetReferralUrlResponse.class);
                     String url = webApiGetReferralUrlResponse.getBody();
-                    messenger.info("Your referring URL is "+url);
+                    messenger.info("Your referring URL is " + url);
                     Desktop.getDesktop().browse(new URL(url).toURI());
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
+                } catch (IOException | URISyntaxException e) {
                     e.printStackTrace();
-                } catch (Exception e) {
-                    //e.printStackTrace();
                 }
             }
         }else{
@@ -410,8 +319,8 @@ public class NodeContext implements TaskObserver, Runnable{
         }
         currentState.handle(this);
     }
-    
-    public void registerNode(String apiPath, Node node) {
+
+    public void registerNodeWeb(APIConnector apiConnector, String apiPath, Node node) {
         if(!isAuthenticated()){
             messenger.info("Sending node registration for user '" + node.getUserEmail() + "'!");
             ObjectMapper mapper = new ObjectMapper();
@@ -421,42 +330,71 @@ public class NodeContext implements TaskObserver, Runnable{
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
-            webApiConnector.setJsonEntity(jsonString);
-            String jsonResponse = webApiConnector.sendRequest(apiPath, RequestMethod.POST);
+            apiConnector.setJsonEntity(jsonString);
+            String jsonResponse = apiConnector.sendRequest(apiPath, RequestMethod.POST);
             
-            Node registeredNode = null;
+            Node registerNode = null;
             WebApiNodeRegisterResponse webApiNodeRegisterResponse = null;
             if(jsonResponse != null && !jsonResponse.isEmpty()){
                 try {
                     webApiNodeRegisterResponse = new ObjectMapper().readValue(jsonResponse, WebApiNodeRegisterResponse.class);
                     if (webApiNodeRegisterResponse.getStatus()) {
-                        registeredNode = webApiNodeRegisterResponse.getBody();
-                        if (registeredNode.getId() != null) {
-                            messenger.info("Succesfuly registered with node "+registeredNode.getShortCode()+"("+registeredNode.getId()+"). "+webApiNodeRegisterResponse.getMessage());
-                            FileOutputStream fileOut =new FileOutputStream("node.txt");
-                            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-                            out.writeObject(registeredNode);
-                            out.close();
-                            fileOut.close();
-                            this.node = registeredNode;
-                            //setName(registeredNode.getId().toString());
-                            //setSecretKey(registeredNode.getSecretKey());
+                        registerNode = webApiNodeRegisterResponse.getBody();
+                        if (registerNode.getId() != null) {
+                            this.node = registerNode;
+                            messenger.info("Succesfuly registered with node "+registerNode.getShortCode()+"("+registerNode.getId()+"). "+webApiNodeRegisterResponse.getMessage());
+                            storeNodeTofile(registerNode);
+                        }else{
+                            messenger.info("Node registration failed: empty node ID from server!");
                         }   
+                    }else{
+                        messenger.info("Node registration failed: " + webApiNodeRegisterResponse.getMessage());
                     }
-                } catch (JsonParseException e) {
-                    e.printStackTrace();
-                } catch (JsonMappingException e) {
-                    e.printStackTrace();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.warning(e.getMessage());
+                    messenger.info("Node registration failed: communication failure!");
                 }
-                
             }
-            if (registeredNode == null) {
-                if (webApiNodeRegisterResponse != null)
-                    messenger.info("Node registration failed: "+webApiNodeRegisterResponse.getMessage());
-                else
-                    messenger.info("Node registration failed!");
+        }else{
+            messenger.error("User is already authenticated! Please use '" + AbstractCommand.LOGOUT + "' first!");
+        }
+        currentState.handle(this);
+    }
+    
+    /**
+     * 
+     * @param apiPath
+     * @param node
+     * @see NodeCommand.REGISTER
+     */
+    public void registerNode(APIConnector apiConnector, String apiPath, Node node) {
+        if(!isAuthenticated()){
+            messenger.info("Sending node registration for user '" + node.getUserEmail() + "'!");
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonString = "";
+            try {
+                jsonString = mapper.writeValueAsString(node);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+            apiConnector.setJsonEntity(jsonString);
+            String jsonResponse = apiConnector.sendRequest(apiPath, RequestMethod.POST);
+            
+            Node registerNode = null;
+            if(jsonResponse != null && !jsonResponse.isEmpty()){
+                try {
+                    registerNode = new ObjectMapper().readValue(jsonResponse, Node.class);
+                    if (registerNode.getId() != null) {
+                        this.node = registerNode;
+                        messenger.info("Succesfuly registered with node "+registerNode.getShortCode()+"("+registerNode.getId()+")!");
+                        storeNodeTofile(registerNode);
+                    }else{
+                        messenger.info("Node registration failed: empty node ID from server!");
+                    }   
+                } catch (IOException e) {
+                    logger.warning(e.getMessage());
+                    messenger.info("Node registration failed: communication failure!");
+                }
             }
         }else{
             messenger.error("User is already authenticated! Please use '" + AbstractCommand.LOGOUT + "' first!");
@@ -510,8 +448,8 @@ public class NodeContext implements TaskObserver, Runnable{
     private void sendResponse(Task task){
         try {
             apiConnector.setJsonEntity(mapper.writeValueAsString(task));
-            System.out.println("Sending task result response to Daratus API to path '" + APICommand.NEXT_TASK_PATH + getNode().getId() + "'!");
-            apiConnector.sendRequest(APICommand.NEXT_TASK_PATH + getNode().getId(), RequestMethod.POST);
+            System.out.println("Sending task result response to Daratus API to path '" + APIConnector.NEXT_TASK_PATH + getNode().getId() + "'!");
+            apiConnector.sendRequest(APIConnector.NEXT_TASK_PATH + getNode().getId(), RequestMethod.POST);
             setCurrentTask(nullTask);
             System.out.println("Result has been sent!");
         } catch (JsonProcessingException e) {
@@ -534,7 +472,7 @@ public class NodeContext implements TaskObserver, Runnable{
         if(task.isCompleted()){
             sendResponse(task);
         }else if(isBlocked()){
-            getNextTask(APICommand.NEXT_TASK_PATH);
+            getNextTask(APIConnector.NEXT_TASK_PATH);
         }
     }
 

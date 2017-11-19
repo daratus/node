@@ -7,7 +7,7 @@ import javax.swing.JOptionPane;
 
 import com.daratus.node.NodeContext;
 import com.daratus.node.domain.Node;
-import com.daratus.node.windows.dialogs.RegisterDialog;
+import com.daratus.node.windows.dialogs.RegisterDialogPanel;
 
 public class RegisterListener implements ActionListener{
 
@@ -22,7 +22,7 @@ public class RegisterListener implements ActionListener{
     
     @Override
     public void actionPerformed(ActionEvent e) {
-        RegisterDialog registerDialog = new RegisterDialog();
+        RegisterDialogPanel registerDialog = new RegisterDialogPanel();
         int result = registerDialog.showDialog();
         if (result == JOptionPane.OK_OPTION) {
             if (!registerDialog.getEnteredUserEmail().isEmpty()) {
@@ -31,7 +31,7 @@ public class RegisterListener implements ActionListener{
                 node.setEthAddress(registerDialog.getEnteredEthAddress());
                 node.setReferalCode(registerDialog.getEnteredReferalCode());
                 
-                context.registerNode(apiPath, node);
+                context.registerNode(context.getWebAPIConnector(), apiPath, node);
             }
         }
     }

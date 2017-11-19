@@ -5,7 +5,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class RegisterDialog extends JPanel{
+public class RegisterDialogPanel extends JPanel{
 
     /**
      * 
@@ -16,7 +16,7 @@ public class RegisterDialog extends JPanel{
     JTextField ethAddressTextField;
     JTextField referalCodeTextField;
     
-    public RegisterDialog() {
+    public RegisterDialogPanel() {
         super();
         
         JLabel label = new JLabel("Email*");

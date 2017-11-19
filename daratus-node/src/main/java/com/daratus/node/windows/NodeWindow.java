@@ -41,7 +41,6 @@ import com.daratus.node.ContextObserver;
 import com.daratus.node.NodeCommand;
 import com.daratus.node.NodeContext;
 import com.daratus.node.NodeState;
-import com.daratus.node.console.APICommand;
 import com.daratus.node.listeners.ApplicationExitListener;
 import com.daratus.node.listeners.GetReferralListener;
 import com.daratus.node.listeners.LoginListener;
@@ -155,12 +154,12 @@ public class NodeWindow extends JFrame implements ContextObserver{
             centerBox.add(noticeLabel);
             centerBox.add(Box.createVerticalStrut(30));
 
-            LoginListener loginListener = new LoginListener(APICommand.NODE_LOGIN_PATH, context);
-            RegisterListener registerListener = new RegisterListener(APICommand.NODE_REGISTER_PATH_WEB, context);
+            LoginListener loginListener = new LoginListener(APIConnector.NODE_LOGIN_PATH, context);
+            RegisterListener registerListener = new RegisterListener(APIConnector.NODE_WEB_REGISTER_PATH, context);
             LogoutListener logoutListener = new LogoutListener(context);
             StartStopListener startListener = new StartStopListener(context, true);
             StartStopListener stopListener = new StartStopListener(context, false);
-            GetReferralListener referralListener = new GetReferralListener(APICommand.NODE_GET_REF_LINK_WEB, context);
+            GetReferralListener referralListener = new GetReferralListener(APIConnector.NODE_WEB_REFERRAL_PATH, context);
             
             // Authentication buttons
             Box mainButtonBox = Box.createHorizontalBox();
@@ -176,7 +175,7 @@ public class NodeWindow extends JFrame implements ContextObserver{
             nodeButtonBox.setAlignmentX(Component.CENTER_ALIGNMENT);
                 nodeButtonBox.add(addWelcomeWindowButton(NodeCommand.START, new JButton("Start"), startListener));
                 nodeButtonBox.add(addWelcomeWindowButton(NodeCommand.STOP, new JButton("Stop"), stopListener));
-                nodeButtonBox.add(addWelcomeWindowButton(NodeCommand.GET_REFERRAL_LINK, new JButton("Get Referral Link"), referralListener));
+                nodeButtonBox.add(addWelcomeWindowButton(NodeCommand.REFERRAL, new JButton("Get Referral Link"), referralListener));
             centerBox.add(nodeButtonBox);    
             centerBox.add(Box.createVerticalStrut(30));
             

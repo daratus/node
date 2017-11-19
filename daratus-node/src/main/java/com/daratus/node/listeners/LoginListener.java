@@ -7,7 +7,7 @@ import javax.swing.JOptionPane;
 
 import com.daratus.node.NodeContext;
 import com.daratus.node.domain.Node;
-import com.daratus.node.windows.dialogs.LoginDialog;
+import com.daratus.node.windows.dialogs.LoginDialogPanel;
 
 /**
  * 
@@ -27,20 +27,20 @@ public class LoginListener implements ActionListener {
     
     @Override
     public void actionPerformed(ActionEvent e) {
-        /*String nodeId = JOptionPane.showInputDialog("Please enter Node ID!");
+        Node node = context.createNodeFromFile();
         
-        if(nodeId !=null && !nodeId.isEmpty()){
-            context.authenticate(apiPath, nodeId);
-        }*/
-        //context.authenticate(apiPath);
-        context.authenticate(apiPath);
+        // First try to login with node details from file
+        if(node != null){
+            context.authenticate(apiPath, node);
+        }
+        // Then if not yet logged in ask user for details
         if (!context.isAuthenticated()) {
-            LoginDialog loginDialog = new LoginDialog();
+            LoginDialogPanel loginDialog = new LoginDialogPanel();
             int result = loginDialog.showDialog();
             if (result == JOptionPane.OK_OPTION) {
                 if (!loginDialog.getNodeCodeFieldText().isEmpty() 
                         && !loginDialog.getNodeSecretKeyFieldText().isEmpty()) {
-                    Node node = new Node();
+                    node = new Node();
                     node.setSecretKey(loginDialog.getNodeSecretKeyFieldText());
                     node.setShortCode(loginDialog.getNodeCodeFieldText());
                     context.authenticate(apiPath, node);

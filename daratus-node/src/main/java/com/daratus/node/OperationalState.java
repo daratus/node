@@ -22,7 +22,7 @@ public class OperationalState extends NodeState{
             NodeCommand.NEXT,
             NodeCommand.EXECUTE,
             NodeCommand.START,
-            NodeCommand.GET_REFERRAL_LINK
+            NodeCommand.REFERRAL
     );
     
     public OperationalState(NodeState initialState) {
